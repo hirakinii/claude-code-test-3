@@ -23,6 +23,13 @@ export function useSchema(schemaId: string, token: string) {
   }, [schemaId, token]);
 
   useEffect(() => {
+    if (!token) {
+      // 認証トークンがない場合
+      setLoading(false);
+      setError('認証が必要です。ログインしてください。');
+      return;
+    }
+
     if (schemaId && token) {
       fetchSchema();
     }

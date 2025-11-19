@@ -55,11 +55,18 @@ function SchemaSettings() {
     return (
       <Container>
         <Box sx={{ my: 4 }}>
-          <Alert severity="error">
-            {error}
-            <Button onClick={refetch} sx={{ ml: 2 }}>
-              再試行
-            </Button>
+          <Alert severity="warning">
+            <Typography variant="body1" gutterBottom>
+              {error}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              現在、認証システムは実装中です。Phase 3 以降で実装予定です。
+            </Typography>
+            {token && (
+              <Button onClick={refetch} sx={{ mt: 2 }}>
+                再試行
+              </Button>
+            )}
           </Alert>
         </Box>
       </Container>
