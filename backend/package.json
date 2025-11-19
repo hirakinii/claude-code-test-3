@@ -4,6 +4,7 @@
   "description": "仕様書作成支援アプリ - Backend API",
   "main": "dist/index.js",
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
@@ -53,6 +54,7 @@
     "prettier": "^3.1.1",
     "typescript": "^5.3.3",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "nodemon": "^3.0.2",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1",
@@ -61,8 +63,8 @@
     "prisma": "^5.8.0"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=24.11.1",
+    "npm": ">=10.9.0"
   },
   "nodemonConfig": {
     "watch": [

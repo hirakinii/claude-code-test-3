@@ -1423,10 +1423,14 @@ import { config } from '../config/env';
 
 /**
  * 一般的なAPIエンドポイント用のレート制限
+ * 本番環境: 15分あたり100リクエストまで
+ * テスト環境: 1秒あたり1000リクエスト（緩い制限で動作確認のみ）
  */
 export const generalLimiter = rateLimit({
-  windowMs: config.rateLimitWindowMs,
-  max: config.rateLimitMaxRequests,
+  windowMs:
+    process.env.NODE_ENV === 'test' ? 1000 : config.rateLimitWindowMs,
+  max:
+    process.env.NODE_ENV === 'test' ? 1000 : config.rateLimitMaxRequests,
   message: {
     success: false,
     error: {
@@ -1440,10 +1444,12 @@ export const generalLimiter = rateLimit({
 
 /**
  * 認証エンドポイント用の厳格なレート制限
+ * 本番環境: 15分あたり5リクエストまで
+ * テスト環境: 1秒あたり100リクエスト（緩い制限で動作確認のみ）
  */
 export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15分
-  max: 5, // 15分あたり5リクエストまで
+  windowMs: process.env.NODE_ENV === 'test' ? 1000 : 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 100 : 5,
   message: {
     success: false,
     error: {
@@ -1453,6 +1459,8 @@ export const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // スキップ条件: ヘルスチェックエンドポイント
+  skip: (req) => req.path.startsWith('/health'),
 });
 ```
 
@@ -1853,6 +1861,93 @@ npm run format:check
 
 ---
 
+## 📝 更新履歴
+
+### v1.0.1 (2025-11-19) - Node.js 24.11.1 対応とセットアップ改善
+
+#### Node.js バージョン要件の更新
+- **Node.js**: 18.x → **24.11.1 (Active LTS)**
+- すべてのDockerfile、CI/CD、package.jsonが更新済み
+- 互換性確認済み（Prisma 5.8.0, TypeScript 5.3.3, Express 4.18.2, bcrypt 5.1.1）
+
+#### 環境変数管理の改善
+
+**新規ファイル**:
+1. **`backend/.env.example`** - 開発環境用テンプレート
+   - Database、JWT、Session、CORS、Rate Limiting等の全設定を網羅
+   - ローカル実行とDocker実行の両方に対応したコメント付き設定
+
+2. **`backend/.env.test`** - テスト環境専用設定（リポジトリ管理）
+   - テスト用データベース: `spec_management_test`
+   - 最適化された設定値（`BCRYPT_SALT_ROUNDS=4`, `LOG_LEVEL=error`）
+   - `backend/tests/setup.ts` で自動読み込み
+
+**セットアップ手順の簡略化**:
+```bash
+# 従来: .env を手動作成して編集が必要
+cp .env.example .env
+# .env ファイルを編集...
+
+# 改善後: テスト環境は .env.test が自動適用
+npm install          # Prisma Client も自動生成
+npm run test:backend # そのまま実行可能
+```
+
+#### レート制限戦略の改善
+
+テスト環境と本番環境で異なるレート制限値を適用:
+
+| 環境 | generalLimiter | authLimiter |
+|------|----------------|-------------|
+| **テスト** | 1秒/1000リクエスト | 1秒/100リクエスト |
+| **本番** | 15分/100リクエスト | 15分/5リクエスト |
+
+**設計の利点**:
+- テスト実行時に429エラーが発生しない（統合テストで複数リクエスト送信可能）
+- レート制限機能のテストも可能（完全無効化ではない）
+- 本番環境ではセキュリティを確保（厳格な制限）
+
+#### Docker 構成の改善
+
+**docker-compose.yml の更新**:
+- サービス名変更: `db` → `postgres`（より明確な命名）
+- 非推奨フィールド削除: `version: '3.9'` を削除（Docker Compose v2対応）
+
+**infrastructure/docker/postgres/init.sql の更新**:
+- テストデータベース（`spec_management_test`）を自動作成
+- Docker環境でもテストがすぐに実行可能
+
+#### クロスプラットフォーム対応
+
+**Husky セットアップの改善**:
+- Windows/Linux/macOS すべてで動作するprepareスクリプトに変更
+- `node -e "try { require('husky').install() } catch (e) {}"`
+
+**Prisma Client 自動生成**:
+- `backend/package.json` に `postinstall` スクリプト追加
+- `npm install` 実行時に自動的に `prisma generate` が実行される
+
+**TypeScript パスマッピング対応**:
+- `tsconfig-paths@^4.2.0` を追加
+- `@/*` エイリアスが実行時に正しく解決される
+
+#### 影響を受ける実装タスク
+
+**Task 1.1.6: データベース接続設定**
+- 環境変数 `DATABASE_URL` は `.env.test` から自動読み込み
+
+**Task 1.3.1: 環境変数管理**
+- `.env.example` と `.env.test` の設定を参照
+
+**Task 1.3.4: レート制限ミドルウェア**
+- 環境別の条件分岐を実装（本ドキュメント更新済み）
+
+**全テストタスク**
+- `.env.test` により環境変数が自動設定される
+- データベース接続エラーが発生しない
+
+---
+
 **作成者**: Claude
 **最終更新**: 2025-11-19
-**バージョン**: 1.0.0
+**バージョン**: 1.0.1

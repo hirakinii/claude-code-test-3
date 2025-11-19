@@ -22,8 +22,9 @@ out/
 .env.production.local
 .env.*.local
 
-# Do NOT ignore example env files
+# Do NOT ignore example and test env files
 !.env.example
+!.env.test
 
 # Logs
 logs/

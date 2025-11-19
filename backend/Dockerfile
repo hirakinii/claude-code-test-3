@@ -1,7 +1,7 @@
 # ================================
 # Development Stage
 # ================================
-FROM node:18-alpine AS development
+FROM node:24.11.1-alpine AS development
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ CMD ["npm", "run", "dev"]
 # ================================
 # Builder Stage
 # ================================
-FROM node:18-alpine AS builder
+FROM node:24.11.1-alpine AS builder
 
 WORKDIR /app
 
@@ -49,7 +49,7 @@ RUN npm prune --production
 # ================================
 # Production Stage
 # ================================
-FROM node:18-alpine AS production
+FROM node:24.11.1-alpine AS production
 
 # Security: Run as non-root user
 RUN addgroup -g 1001 -S nodejs && \

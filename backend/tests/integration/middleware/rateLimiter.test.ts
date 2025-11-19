@@ -86,7 +86,15 @@ describe('Rate Limiter Middleware', () => {
       const response = await request(app).post('/auth/login');
 
       const limit = parseInt(response.headers['ratelimit-limit'] || '0', 10);
-      expect(limit).toBe(5); // Auth limiter has max of 5
+      // In test environment: 100, in production: 5
+      const expectedLimit = process.env.NODE_ENV === 'test' ? 100 : 5;
+      expect(limit).toBe(expectedLimit);
+
+      // Verify authLimiter is stricter than generalLimiter
+      // Test env: authLimiter (100) < generalLimiter (1000)
+      // Production: authLimiter (5) < generalLimiter (100)
+      const generalLimit = process.env.NODE_ENV === 'test' ? 1000 : 100;
+      expect(limit).toBeLessThan(generalLimit);
     });
   });
 
