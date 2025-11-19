@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import { healthRouter } from './routes/health';
+import authRouter from './routes/auth';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
 
@@ -34,6 +35,7 @@ export function createServer(): Application {
 
   // Routes
   app.use('/health', healthRouter);
+  app.use('/api/auth', authRouter);
 
   // 404 handler
   app.use((_req, res) => {
