@@ -10,6 +10,7 @@
   - [npm を使用する場合](#npm-を使用する場合)
   - [Docker を使用する場合](#docker-を使用する場合)
 - [開発](#開発)
+- [実装フェーズ](#実装フェーズ)
 - [テスト](#テスト)
 - [デプロイ](#デプロイ)
 - [プロジェクト構成](#プロジェクト構成)
@@ -215,6 +216,40 @@ git push origin feature/your-feature-name
 - `bugfix/` - バグ修正
 - `hotfix/` - 緊急修正
 - `refactor/` - リファクタリング
+
+## 実装フェーズ
+
+本プロジェクトは段階的に実装されています。各フェーズの詳細は以下のドキュメントを参照してください。
+
+### Phase 0: プロジェクト基盤構築 ✅ 完了
+- プロジェクト構造作成
+- 開発環境セットアップ
+- CI/CD基本設定
+- Linter/Formatter設定
+
+詳細: [docs/phase0/](./docs/phase0/)
+
+### Phase 1: バックエンド基盤 ✅ 完了
+- データベース設計実装（Prisma）
+- 認証・認可基盤（JWT、RBAC）
+- 基本APIフレームワーク（Express、エラーハンドリング、ロギング）
+- ヘルスチェックエンドポイント
+
+詳細: [docs/phase1/](./docs/phase1/)
+
+### Phase 2: スキーマ管理機能 🚧 実装準備中
+- スキーマAPI実装（取得、CRUD操作）
+- 設定画面（フロントエンド）
+- ドラッグ&ドロップ機能
+- テスト実装
+
+**実装計画書**: [docs/plan/phase-2-implementation-plan.md](./docs/plan/phase-2-implementation-plan.md)
+**クイックスタート**: [docs/plan/phase-2-quick-start.md](./docs/plan/phase-2-quick-start.md)
+
+### Phase 3 以降
+Phase 3以降の実装計画は [docs/plan/implementation-plan.md](./docs/plan/implementation-plan.md) を参照してください。
+
+---
 
 ## テスト
 
