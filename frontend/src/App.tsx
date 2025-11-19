@@ -1,7 +1,9 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { Container, Typography, Box, Button } from '@mui/material';
+import { Container, Typography, Box, Button, CircularProgress } from '@mui/material';
 import { Settings } from '@mui/icons-material';
-import SchemaSettings from './pages/SchemaSettings';
+
+const SchemaSettings = lazy(() => import('./pages/SchemaSettings'));
 
 function HomePage() {
   return (
@@ -46,10 +48,23 @@ function HomePage() {
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/settings/schema" element={<SchemaSettings />} />
-      </Routes>
+      <Suspense
+        fallback={
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="100vh"
+          >
+            <CircularProgress />
+          </Box>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/settings/schema" element={<SchemaSettings />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
