@@ -1,0 +1,42 @@
+/** @type {import('jest').Config} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/tests', '<rootDir>/src'],
+  testMatch: ['**/*.test.ts', '**/*.spec.ts'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@config/(.*)$': '<rootDir>/src/config/$1',
+    '^@middleware/(.*)$': '<rootDir>/src/middleware/$1',
+    '^@routes/(.*)$': '<rootDir>/src/routes/$1',
+    '^@controllers/(.*)$': '<rootDir>/src/controllers/$1',
+    '^@services/(.*)$': '<rootDir>/src/services/$1',
+    '^@repositories/(.*)$': '<rootDir>/src/repositories/$1',
+    '^@models/(.*)$': '<rootDir>/src/models/$1',
+    '^@utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@types/(.*)$': '<rootDir>/src/types/$1',
+  },
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/index.ts',
+    '!src/types/**/*',
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  testTimeout: 30000,
+  verbose: true,
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true,
+};
