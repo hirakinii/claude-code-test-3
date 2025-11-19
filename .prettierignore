@@ -1,0 +1,48 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+build/
+out/
+.next/
+coverage/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Git
+.git/
+
+# Cache
+.cache/
+.eslintcache
+.stylelintcache
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Other
+*.min.js
+*.min.css
