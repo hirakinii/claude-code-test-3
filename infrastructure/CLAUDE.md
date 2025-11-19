@@ -250,7 +250,7 @@ resource "google_project_iam_member" "backend_secret" {
 ### Backend Dockerfile
 ```dockerfile
 # Multi-stage build
-FROM node:18-alpine AS builder
+FROM node:24.11.1-alpine AS builder
 
 WORKDIR /app
 
@@ -261,7 +261,7 @@ COPY . .
 RUN npm run build
 
 # Production image
-FROM node:18-alpine
+FROM node:24.11.1-alpine
 
 WORKDIR /app
 
@@ -278,7 +278,7 @@ CMD ["node", "dist/index.js"]
 ### Frontend Dockerfile
 ```dockerfile
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:24.11.1-alpine AS builder
 
 WORKDIR /app
 

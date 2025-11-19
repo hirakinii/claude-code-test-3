@@ -61,8 +61,8 @@
     "prisma": "^5.8.0"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=24.11.1",
+    "npm": ">=10.9.0"
   },
   "nodemonConfig": {
     "watch": [
