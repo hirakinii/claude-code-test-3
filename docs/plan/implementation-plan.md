@@ -237,28 +237,28 @@
 - 権限チェック（管理者のみアクセス可能）のテスト
 
 **セキュリティチェック**:
-- [ ] 管理者ロール検証（全エンドポイント）
-- [ ] 入力値バリデーション（field_name, data_type等）
-- [ ] SQLインジェクション対策（ORMによる保護確認）
-- [ ] XSS対策（入力サニタイゼーション）
+- [x] 管理者ロール検証（全エンドポイント）
+- [x] 入力値バリデーション（field_name, data_type等）
+- [x] SQLインジェクション対策（ORMによる保護確認）
+- [x] XSS対策（入力サニタイゼーション）
 
 **実装内容**:
-- [ ] `GET /api/schema/:schemaId` - スキーマ定義取得
+- [x] `GET /api/schema/:schemaId` - スキーマ定義取得
   - カテゴリとフィールドを display_order でソート
   - JOIN最適化
-- [ ] `POST /api/schema/categories` - カテゴリ追加
+- [x] `POST /api/schema/categories` - カテゴリ追加
   - バリデーション実装
-- [ ] `PUT /api/schema/categories/:id` - カテゴリ編集
+- [x] `PUT /api/schema/categories/:id` - カテゴリ編集
   - 存在確認
   - display_order 更新
-- [ ] `DELETE /api/schema/categories/:id` - カテゴリ削除
+- [x] `DELETE /api/schema/categories/:id` - カテゴリ削除
   - カスケード削除（関連フィールド）
-- [ ] `POST /api/schema/fields` - フィールド追加
+- [x] `POST /api/schema/fields` - フィールド追加
   - data_type ENUM検証
   - options JSON検証
-- [ ] `PUT /api/schema/fields/:id` - フィールド編集
-- [ ] `DELETE /api/schema/fields/:id` - フィールド削除
-- [ ] `POST /api/schema/reset` - デフォルト復元
+- [x] `PUT /api/schema/fields/:id` - フィールド編集
+- [x] `DELETE /api/schema/fields/:id` - フィールド削除
+- [x] `POST /api/schema/reset` - デフォルト復元
   - トランザクション処理
   - シードデータからの復元
 
@@ -272,19 +272,19 @@
 - エラーハンドリング表示のテスト
 
 **実装内容**:
-- [ ] スキーマ設定画面UI実装
+- [x] スキーマ設定画面UI実装
   - Material-UI データテーブル
   - モーダルダイアログ
-- [ ] カテゴリCRUD操作
+- [x] カテゴリCRUD操作
   - 追加フォーム
   - 編集フォーム
   - 削除確認ダイアログ
-- [ ] フィールドCRUD操作
+- [x] フィールドCRUD操作
   - データ型選択（セレクトボックス）
   - 必須フラグ（チェックボックス）
   - オプション設定（JSON入力）
-- [ ] ドラッグ&ドロップによる順序変更
-  - react-beautiful-dnd 使用
+- [x] ドラッグ&ドロップによる順序変更
+  - @dnd-kit 使用（react-beautiful-dnd の代替）
   - display_order 自動更新
 
 ---
