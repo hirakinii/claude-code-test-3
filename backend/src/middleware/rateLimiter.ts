@@ -4,6 +4,7 @@ import { config } from '../config/env';
 /**
  * 一般的なAPIエンドポイント用のレート制限
  * 15分あたり100リクエストまで
+ * テスト環境では無効化
  */
 export const generalLimiter = rateLimit({
   windowMs: config.rateLimitWindowMs,
@@ -17,11 +18,14 @@ export const generalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // スキップ条件: テスト環境
+  skip: () => process.env.NODE_ENV === 'test',
 });
 
 /**
  * 認証エンドポイント用の厳格なレート制限
  * 15分あたり5リクエストまで
+ * テスト環境では無効化
  */
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15分
@@ -35,6 +39,7 @@ export const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // スキップ条件: ヘルスチェックエンドポイントはスキップ
-  skip: (req) => req.path.startsWith('/health'),
+  // スキップ条件: ヘルスチェックエンドポイントまたはテスト環境
+  skip: (req) =>
+    req.path.startsWith('/health') || process.env.NODE_ENV === 'test',
 });
