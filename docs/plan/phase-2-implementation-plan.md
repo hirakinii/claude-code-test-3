@@ -5,9 +5,11 @@
 **見積もり期間**: 3-4日
 **前提条件**:
 - Phase 1（バックエンド基盤）が完了していること
-- React v19.2.0 以上がインストールされていること
-- Material-UI v7.3.5 以上がインストールされていること
-- @dnd-kit がインストールされていること
+- React v19.1.1（正確なバージョン固定）
+- Material-UI v7.3.2（正確なバージョン固定）
+- react-router-dom v7.9.1 以上
+- @dnd-kit v6.3.1 以上がインストールされていること
+- **注意**: Redux は不要（ローカル状態管理で対応）
 
 ---
 
@@ -2013,6 +2015,189 @@ Phase 2 完了後、以下のステップに進みます：
 
 ---
 
+## 📝 更新履歴
+
+### v1.0.1 (2025-11-19) - React 19 互換性対応とライブラリバージョン最適化
+
+#### ライブラリバージョンの変更
+
+**バージョンダウングレード**（互換性確保のため）:
+- **React**: 19.2.0 → **19.1.1** （正確なバージョン固定）
+- **React DOM**: 19.2.0 → **19.1.1** （正確なバージョン固定）
+- **@mui/material**: 7.3.5 → **7.3.2** （正確なバージョン固定）
+- **@mui/icons-material**: 7.3.5 → **7.3.2** （正確なバージョン固定）
+- **@types/react**: 19.2.6 → **19.1.1**
+- **@types/react-dom**: 19.2.3 → **19.1.1**
+
+**バージョンアップグレード**:
+- **react-router-dom**: 6.21.1 → **7.9.1**
+- **react-router**: **7.9.1** （新規追加）
+
+**削除**:
+- **Redux関連**: Phase 2 では不要のため削除
+  - `@reduxjs/toolkit`（依存関係には残るが未使用）
+  - `react-redux`（依存関係には残るが未使用）
+  - `frontend/src/store/index.ts`（削除）
+
+**設計変更の理由**:
+- React 19.2.0 は最新すぎて Material-UI v7 の ThemeProvider と互換性問題が発生
+- React 19.1.1 + MUI 7.3.2 は実績のある安定した組み合わせ（ユーザーの別プロジェクトで確認済み）
+- semver 範囲指定（`^`）を削除し、正確なバージョン固定で予期しない更新を防止
+
+#### アーキテクチャの簡素化
+
+**React.StrictMode の削除**:
+- React 19 の StrictMode と Material-UI v7 の互換性問題により一時的に削除
+- `frontend/src/main.tsx` から StrictMode ラッパーを削除
+- 将来的に MUI が React 19 に完全対応したら再有効化を検討
+
+**Redux の非使用**:
+- Phase 2 ではグローバル状態管理が不要
+- 以下のローカル状態管理で十分対応可能:
+  - `useSchema` カスタムフック: スキーマデータの取得と管理
+  - `useState`: コンポーネントローカル状態（モーダル開閉など）
+  - props経由のデータ伝播
+- `frontend/src/store/` ディレクトリ削除
+- `frontend/src/main.tsx` から Redux Provider 削除
+
+**React Router の改善**:
+- `component={Link}` → `onClick={() => navigate(...)}` に変更
+  - React 19 と MUI の `Button` コンポーネントの互換性問題を解決
+  - `useNavigate` フックの使用を推奨
+- SchemaSettings コンポーネントの遅延ロード（lazy loading）を追加
+  - 初期ページロード時のバンドルサイズ削減
+  - パフォーマンス向上
+
+#### フロントエンド構成の変更
+
+**新規ファイル**:
+```
+frontend/src/
+├── api/
+│   └── schemaApi.ts          # Schema API クライアント（axios）
+├── hooks/
+│   └── useSchema.ts          # スキーマデータ取得フック
+└── pages/
+    └── SchemaSettings/
+        ├── index.tsx         # メインページ
+        ├── CategoryList.tsx  # カテゴリ一覧（@dnd-kit）
+        ├── CategoryForm.tsx  # カテゴリフォーム
+        ├── FieldList.tsx     # フィールド一覧
+        └── FieldForm.tsx     # フィールドフォーム
+```
+
+**削除ファイル**:
+```
+frontend/src/
+└── store/
+    └── index.ts              # Redux store（削除）
+```
+
+#### 発生した問題と解決策
+
+**問題1**: 無限ローディングスピナー
+- **原因**: `useSchema` フックで token が空の場合、`fetchSchema` が実行されず `loading` が `true` のまま
+- **解決**: token が空の場合にエラー状態を設定し、ローディングを終了
+  ```typescript
+  if (!token) {
+    setLoading(false);
+    setError('認証が必要です。ログインしてください。');
+    return;
+  }
+  ```
+
+**問題2**: "Element type is invalid" エラー
+- **原因**: React 19.2.0 の StrictMode と Material-UI v7 の ThemeProvider の互換性問題
+- **解決策1**: React.StrictMode を削除
+- **解決策2**: React を 19.1.1 にダウングレード
+- **解決策3**: MUI を 7.3.2 にダウングレード
+- **解決策4**: Button の `component={Link}` を `useNavigate` に変更
+
+**問題3**: Redux "Store does not have a valid reducer" エラー
+- **原因**: 空の reducer オブジェクト `reducer: {}` は Redux Toolkit で許可されていない
+- **解決**: Redux を完全に削除（Phase 2 では不要）
+
+#### package.json の設定変更
+
+**正確なバージョン固定**:
+```json
+{
+  "dependencies": {
+    "react": "19.1.1",               // ^ を削除
+    "react-dom": "19.1.1",           // ^ を削除
+    "@mui/material": "7.3.2",        // ^ を削除
+    "@mui/icons-material": "7.3.2",  // ^ を削除
+    "react-router": "^7.9.1",
+    "react-router-dom": "^7.9.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.1",        // ^ を削除
+    "@types/react-dom": "19.1.1"     // ^ を削除
+  }
+}
+```
+
+#### 影響を受けるセクション
+
+**2.2 設定画面（フロントエンド）の実装内容**:
+- Redux の記載を削除
+- 状態管理は `useSchema` フックと `useState` を使用
+- ドラッグ&ドロップは `@dnd-kit` を使用（react-beautiful-dnd ではない）
+
+**6.1 環境構築の前提条件**:
+- React 19.1.1 と MUI 7.3.2 のバージョン固定を明記
+- Redux のインストール手順を削除
+
+**7. テスト実装**:
+- Redux関連のテストを削除
+- `useSchema` フックのテストを追加
+
+#### セットアップ手順の変更
+
+**従来の手順**（問題あり）:
+```bash
+npm install  # React 19.2.0, MUI 7.3.5 がインストールされる
+npm run dev:frontend  # エラー発生
+```
+
+**改善後の手順**（正常動作）:
+```bash
+# package.json の設定を確認
+# react: "19.1.1", @mui/material: "7.3.2" になっていることを確認
+
+npm install  # 正確なバージョンがインストールされる
+npm run dev:frontend  # 正常動作
+```
+
+#### 実装済みコミット
+
+以下のコミットでバージョン問題が解決済み:
+
+1. `b4d479c` - Redux の削除
+2. `3a386e6` - Button component prop の useNavigate 変更
+3. `a49038f` - SchemaSettings の lazy loading 追加
+4. `0d0aeeb` - React.StrictMode の削除
+5. `8767559` - React 19.1.1 と MUI 7.3.2 へのダウングレード
+6. `1b91e1b` - 無限ローディングスピナーの修正
+
+#### 今後の注意事項
+
+**バージョン更新時の確認**:
+- React や MUI をアップグレードする際は、互換性を十分に確認
+- 可能であれば React 19.1.1 + MUI 7.3.2 の組み合わせを維持
+- アップグレードする場合は、以下を実施:
+  1. 別ブランチで検証
+  2. ThemeProvider のエラーが発生しないことを確認
+  3. すべてのページが正常に表示されることを確認
+  4. React.StrictMode の再有効化を検討
+
+**Redux の再導入判断**:
+- Phase 3 以降でグローバル状態管理が必要になった場合のみ検討
+- 認証状態の管理（現在は localStorage）
+- 複数ページ間でのデータ共有が必要な場合
+
+---
+
 **作成者**: Claude
 **最終更新**: 2025-11-19
-**バージョン**: 1.0.0
+**バージョン**: 1.0.1
