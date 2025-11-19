@@ -68,33 +68,49 @@ cp .env.example .env
 #### 3. PostgreSQL のセットアップ
 ```bash
 # PostgreSQL サービスが起動していることを確認
-# データベースを作成
+# 開発用データベースを作成
 createdb spec_management_db
+
+# テスト用データベースを作成
+createdb spec_management_test
 ```
 
 #### 4. Backend のセットアップ
 ```bash
+# Backend 用の環境変数を設定
 cd backend
+cp .env.example .env
+
+# .env ファイルを編集（必要に応じて）
+# DATABASE_URL, JWT_SECRET などを設定
+# Windows: notepad .env
+# macOS/Linux: nano .env または vi .env
+
+# 依存関係のインストール（root ディレクトリで実行済みの場合はスキップ可）
+cd ..
 npm install
-npm run migrate  # データベースマイグレーション
-npm run seed     # 初期データ投入（オプション）
 ```
 
-#### 5. Frontend のセットアップ
+#### 5. データベースマイグレーション
 ```bash
-cd frontend
-npm install
+# root ディレクトリで実行
+npm run prisma:migrate --workspace=backend
+
+# 初期データ投入（オプション）
+npm run prisma:seed --workspace=backend
 ```
 
 #### 6. アプリケーションの起動
 ```bash
-# Backend (別ターミナル)
-cd backend
+# root ディレクトリから Backend と Frontend を同時起動
 npm run dev
 
-# Frontend (別ターミナル)
-cd frontend
-npm start
+# または、個別に起動する場合
+# Backend のみ
+npm run dev:backend
+
+# Frontend のみ
+npm run dev:frontend
 ```
 
 アプリケーションが起動したら、ブラウザで http://localhost:3000 にアクセスしてください。
@@ -202,22 +218,42 @@ git push origin feature/your-feature-name
 
 ## テスト
 
+### テスト実行前の準備
+```bash
+# 1. テスト用データベースが作成されていることを確認
+createdb spec_management_test  # まだ作成していない場合
+
+# 2. PostgreSQL が起動していることを確認
+# Windows: サービスから確認
+# macOS/Linux: sudo systemctl status postgresql
+
+# 3. Docker を使用する場合
+docker-compose up -d postgres
+```
+
 ### Backend テスト
 ```bash
-cd backend
+# root ディレクトリで実行（推奨）
+npm run test:backend
 
-# ユニットテスト
+# または、backend ディレクトリで実行
+cd backend
 npm test
 
 # カバレッジ付きテスト
-npm run test:coverage
+npm test
 
-# 統合テスト
+# 統合テストのみ
 npm run test:integration
+
+# ユニットテストのみ
+npm run test:unit
 
 # テストウォッチモード
 npm run test:watch
 ```
+
+**注意**: テストは自動的に `.env.test` ファイルを読み込みます。個別の設定が必要な場合は、`backend/.env.test.local` を作成してください。
 
 ### Frontend テスト
 ```bash
