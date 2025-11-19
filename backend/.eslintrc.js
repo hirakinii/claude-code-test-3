@@ -69,5 +69,5 @@ module.exports = {
     'no-param-reassign': 'warn',
     'prefer-promise-reject-errors': 'error',
   },
-  ignorePatterns: ['dist', 'node_modules', '*.config.js', 'coverage'],
+  ignorePatterns: ['dist', 'node_modules', '*.config.js', 'coverage', 'prisma', 'tests'],
 };

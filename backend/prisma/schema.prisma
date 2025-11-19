@@ -1,0 +1,232 @@
+// Prisma Schema for 仕様書作成支援アプリ
+// Generated: 2025-11-19
+// Based on: データモデル設計書
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Enum Definitions
+// ============================================
+
+/// ロール名の列挙型
+enum RoleName {
+  ADMINISTRATOR /// 仕様書管理者
+  CREATOR       /// 仕様書作成者
+}
+
+/// フィールドのデータ型
+enum DataType {
+  TEXT      /// テキスト入力
+  TEXTAREA  /// テキストエリア
+  DATE      /// 日付
+  RADIO     /// ラジオボタン
+  CHECKBOX  /// チェックボックス
+  LIST      /// 動的リスト（サブエンティティへの参照）
+}
+
+/// 仕様書のステータス
+enum SpecificationStatus {
+  DRAFT  /// 編集中
+  REVIEW /// 確認中
+  SAVED  /// 保存済み
+}
+
+// ============================================
+// User & Role Models (認証・認可)
+// ============================================
+
+/// ユーザー
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  fullName     String   @map("full_name")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  userRoles      UserRole[]
+  specifications Specification[]
+
+  @@map("users")
+}
+
+/// ロール
+model Role {
+  id       Int      @id @default(autoincrement())
+  roleName RoleName @unique @map("role_name")
+
+  userRoles UserRole[]
+
+  @@map("roles")
+}
+
+/// ユーザーとロールの多対多関係
+model UserRole {
+  userId String @map("user_id") @db.Uuid
+  roleId Int    @map("role_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+// ============================================
+// Schema Models (スキーマ層 - メタデータ)
+// ============================================
+
+/// スキーマ（仕様書テンプレート）
+model Schema {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @map("schema_name")
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  categories     SchemaCategory[]
+  specifications Specification[]
+
+  @@map("schemas")
+}
+
+/// スキーマカテゴリ（ウィザードのステップ）
+model SchemaCategory {
+  id           String  @id @default(uuid()) @db.Uuid
+  schemaId     String  @map("schema_id") @db.Uuid
+  name         String  @map("category_name")
+  description  String?
+  displayOrder Int     @map("display_order")
+
+  schema Schema        @relation(fields: [schemaId], references: [id], onDelete: Cascade)
+  fields SchemaField[]
+
+  @@index([schemaId])
+  @@map("schema_categories")
+}
+
+/// スキーマフィールド（入力項目定義）
+model SchemaField {
+  id               String   @id @default(uuid()) @db.Uuid
+  categoryId       String   @map("category_id") @db.Uuid
+  fieldName        String   @map("field_name")
+  dataType         DataType @map("data_type")
+  isRequired       Boolean  @default(false) @map("is_required")
+  options          Json?    /// ラジオ/チェックボックスの選択肢
+  placeholderText  String?  @map("placeholder_text")
+  listTargetEntity String?  @map("list_target_entity") /// LIST型の場合の参照先エンティティ名
+  displayOrder     Int      @map("display_order")
+
+  category             SchemaCategory         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  specificationContent SpecificationContent[]
+
+  @@index([categoryId])
+  @@map("schema_fields")
+}
+
+// ============================================
+// Specification Models (インスタンス層 - データ)
+// ============================================
+
+/// 仕様書
+model Specification {
+  id        String              @id @default(uuid()) @db.Uuid
+  authorId  String              @map("author_user_id") @db.Uuid
+  schemaId  String              @map("schema_id") @db.Uuid
+  title     String?             /// 非正規化: パフォーマンスのため件名をキャッシュ
+  status    SpecificationStatus @default(DRAFT)
+  version   String              @default("1.0")
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+
+  author User   @relation(fields: [authorId], references: [id])
+  schema Schema @relation(fields: [schemaId], references: [id])
+
+  content                   SpecificationContent[]
+  deliverables              Deliverable[]
+  contractorRequirements    ContractorRequirement[]
+  basicBusinessRequirements BasicBusinessRequirement[]
+  businessTasks             BusinessTask[]
+
+  @@index([authorId])
+  @@index([schemaId])
+  @@map("specifications")
+}
+
+/// 仕様書コンテンツ（EAVパターン）
+model SpecificationContent {
+  id              String @id @default(uuid()) @db.Uuid
+  specificationId String @map("specification_id") @db.Uuid
+  fieldId         String @map("field_id") @db.Uuid
+  value           String @db.Text /// JSONBも検討可能
+
+  specification Specification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
+  field         SchemaField   @relation(fields: [fieldId], references: [id])
+
+  @@index([specificationId])
+  @@index([fieldId])
+  @@map("specification_contents")
+}
+
+// ============================================
+// Sub-Entity Models (1:N動的リスト)
+// ============================================
+
+/// 納品物
+model Deliverable {
+  id              String  @id @default(uuid()) @db.Uuid
+  specificationId String  @map("specification_id") @db.Uuid
+  name            String
+  quantity        Int
+  description     String? @db.Text
+
+  specification Specification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
+
+  @@index([specificationId])
+  @@map("deliverables")
+}
+
+/// 受注者要件
+model ContractorRequirement {
+  id              String @id @default(uuid()) @db.Uuid
+  specificationId String @map("specification_id") @db.Uuid
+  category        String
+  description     String @db.Text
+
+  specification Specification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
+
+  @@index([specificationId])
+  @@map("contractor_requirements")
+}
+
+/// 業務基本要件
+model BasicBusinessRequirement {
+  id              String @id @default(uuid()) @db.Uuid
+  specificationId String @map("specification_id") @db.Uuid
+  category        String
+  description     String @db.Text
+
+  specification Specification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
+
+  @@index([specificationId])
+  @@map("basic_business_requirements")
+}
+
+/// 業務タスク
+model BusinessTask {
+  id              String @id @default(uuid()) @db.Uuid
+  specificationId String @map("specification_id") @db.Uuid
+  title           String
+  detailedSpec    String @db.Text @map("detailed_spec")
+
+  specification Specification @relation(fields: [specificationId], references: [id], onDelete: Cascade)
+
+  @@index([specificationId])
+  @@map("business_tasks")
+}
