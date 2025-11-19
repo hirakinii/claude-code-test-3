@@ -1,11 +1,13 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Container, Typography, Box, Button, CircularProgress } from '@mui/material';
 import { Settings } from '@mui/icons-material';
 
 const SchemaSettings = lazy(() => import('./pages/SchemaSettings'));
 
 function HomePage() {
+  const navigate = useNavigate();
+
   return (
     <Container maxWidth="lg">
       <Box
@@ -32,8 +34,7 @@ function HomePage() {
         </Typography>
         <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
           <Button
-            component={Link}
-            to="/settings/schema"
+            onClick={() => navigate('/settings/schema')}
             variant="contained"
             startIcon={<Settings />}
           >
