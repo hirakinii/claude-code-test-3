@@ -15,6 +15,34 @@
 - [ ] シードデータが投入されていること
 - [ ] テストユーザーでログインできること
 
+### ⚠️ 重要: フロントエンドライブラリのバージョン要件
+
+**React 19.x + Material-UI v7.x の互換性問題により、以下の厳密なバージョン指定が必要です:**
+
+```json
+{
+  "dependencies": {
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "@mui/material": "7.3.2",
+    "@mui/icons-material": "7.3.2"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.1",
+    "@types/react-dom": "19.1.1"
+  }
+}
+```
+
+**注意事項:**
+- `^` プレフィックスを使用せず、**exact versions**（厳密バージョン）を指定してください
+- React 19.2.0 は MUI v7 との互換性問題があることが確認されています
+- `npm install` 後に必ず `rm -rf node_modules package-lock.json && npm install` を実行してください
+
+**アーキテクチャ上の変更:**
+- **Redux**: Phase 2 ではローカルステート管理のみ使用（Redux は不要）
+- **React.StrictMode**: MUI v7 との互換性のため、一時的に無効化されています
+
 ### 確認コマンド
 
 ```bash
@@ -381,6 +409,77 @@ npm run test:e2e
 
 ## トラブルシューティング
 
+### ⚠️ React 19.x + Material-UI v7 互換性問題
+
+#### 問題 1: "Element type is invalid" エラー（ThemeProvider関連）
+
+**エラー内容:**
+```
+Error: Element type is invalid: expected a string (for built-in components)
+or a class/function (for composite components) but got: object.
+Check the render method of ThemeProvider3.
+```
+
+**原因:**
+- React 19.2.0 と Material-UI v7.3.5 の組み合わせに互換性問題
+- React.StrictMode がMUI v7のネストされたThemeProviderと衝突
+
+**解決方法:**
+```bash
+cd frontend
+
+# 1. package.json を正しいバージョンに修正（exact versions、^ なし）
+# "react": "19.1.1",
+# "react-dom": "19.1.1",
+# "@mui/material": "7.3.2",
+# "@mui/icons-material": "7.3.2",
+# "@types/react": "19.1.1",
+# "@types/react-dom": "19.1.1"
+
+# 2. クリーンインストール
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### 問題 2: Redux Store エラー（"Store does not have a valid reducer"）
+
+**原因:**
+- Redux Toolkit は空の reducer オブジェクト `reducer: {}` を許可しない
+- Phase 2 ではグローバルステート管理が不要
+
+**解決方法:**
+```bash
+# Redux 関連ファイルを削除
+rm -rf frontend/src/store
+
+# main.tsx と App.tsx から Redux Provider を削除
+# （詳細は phase-2-implementation-plan.md の v1.0.1 を参照）
+```
+
+#### 問題 3: 無限ローディングスピナー（/settings/schema ページ）
+
+**原因:**
+- `useSchema` フックで token が空文字列の場合、`loading` が `true` のまま更新されない
+
+**解決方法:**
+- `frontend/src/hooks/useSchema.ts` で token チェックを追加済み
+- 認証なしでアクセスすると適切な警告メッセージを表示
+
+#### 問題 4: Button component prop エラー
+
+**原因:**
+- Material-UI Button の `component={Link}` プロップが React 19 と互換性なし
+
+**解決方法:**
+```typescript
+// 修正前
+<Button component={Link} to="/settings/schema">
+
+// 修正後
+const navigate = useNavigate();
+<Button onClick={() => navigate('/settings/schema')}>
+```
+
 ### データベース接続エラー
 
 ```bash
@@ -466,5 +565,181 @@ Phase 2 完了後:
 
 ---
 
+## 📝 更新履歴
+
+### v1.0.1 (2025-11-19) - React 19.x + Material-UI v7 互換性対応
+
+#### 背景
+
+Phase 2 実装中に **React 19.2.0 と Material-UI v7.3.5 の組み合わせで深刻な互換性問題** が発生しました。5時間のデバッグの結果、以下の安定版バージョンの組み合わせで問題が解決されました。
+
+#### ライブラリバージョンの変更
+
+| ライブラリ | 元のバージョン | 修正後のバージョン | 理由 |
+|----------|--------------|-----------------|------|
+| react | 19.2.0 | **19.1.1** (exact) | MUI v7との互換性確保 |
+| react-dom | 19.2.0 | **19.1.1** (exact) | Reactに合わせて統一 |
+| @mui/material | 7.3.5 | **7.3.2** (exact) | React 19.1.1との互換性確保 |
+| @mui/icons-material | 7.3.5 | **7.3.2** (exact) | MUIのバージョン統一 |
+| @types/react | 19.2.6 | **19.1.1** (exact) | Reactに合わせた型定義 |
+| @types/react-dom | 19.2.3 | **19.1.1** (exact) | React DOMに合わせた型定義 |
+| react-router-dom | 6.21.1 | **7.9.1** | 最新安定版へ更新 |
+
+**重要**: `package.json` で `^` プレフィックスを削除し、exact versionsを指定しています。これにより、`npm install` 時に意図しないバージョンアップを防ぎます。
+
+#### アーキテクチャの簡素化
+
+**1. Redux の削除**
+- **理由**: Phase 2 の機能はローカルステート管理で十分
+- **削除ファイル**: `frontend/src/store/index.ts`
+- **影響範囲**: `main.tsx`, `App.tsx` から Redux Provider を削除
+- **利点**:
+  - コード量削減
+  - Redux Toolkit の "empty reducer" エラー回避
+  - デバッグの簡素化
+
+**2. React.StrictMode の無効化**
+- **理由**: React 19 の StrictMode が MUI v7 の ThemeProvider とコンフリクト
+- **影響ファイル**: `frontend/src/main.tsx`
+- **将来の対応**: MUI が React 19 を完全サポート後に再有効化を検討
+
+#### フロントエンド構造の変更
+
+**新規作成されたファイル:**
+```
+frontend/src/
+├── api/
+│   └── schemaApi.ts              # Schema API クライアント
+├── hooks/
+│   └── useSchema.ts              # Schema データフェッチング用カスタムフック
+└── pages/
+    └── SchemaSettings/
+        ├── index.tsx             # メインページ
+        ├── CategoryList.tsx      # ドラッグ&ドロップ可能なカテゴリリスト
+        ├── CategoryForm.tsx      # カテゴリ作成/編集フォーム
+        ├── FieldList.tsx         # フィールド一覧表示
+        └── FieldForm.tsx         # フィールド作成/編集フォーム
+```
+
+**削除されたファイル:**
+```
+frontend/src/
+└── store/
+    └── index.ts                  # Redux store（不要のため削除）
+```
+
+**修正されたファイル:**
+- `frontend/src/main.tsx`: Redux Provider 削除、StrictMode 削除
+- `frontend/src/App.tsx`: Redux imports 削除、lazy loading 追加、Button navigation 修正
+- `frontend/package.json`: バージョン修正（exact versions）
+
+#### 発生した問題と解決策
+
+**問題 1: ThemeProvider エラー**
+- **エラー**: "Element type is invalid ... ThemeProvider3"
+- **原因**: React 19.2.0 + MUI v7.3.5 の互換性問題
+- **解決**: React 19.1.1 + MUI 7.3.2 へダウングレード
+- **コミット**: `8767559`
+
+**問題 2: Redux Store エラー**
+- **エラー**: "Store does not have a valid reducer"
+- **原因**: Redux Toolkit が空の reducer を許可しない
+- **解決**: Redux を完全削除
+- **コミット**: `b4d479c`
+
+**問題 3: 無限ローディングスピナー**
+- **エラー**: `/settings/schema` ページでスピナーが永続表示
+- **原因**: token が空の場合に `loading` が `true` のまま
+- **解決**: `useSchema` フックで token チェックを追加し、適切なエラーメッセージを表示
+- **コミット**: `1b91e1b`
+
+**問題 4: StrictMode による二重レンダリング**
+- **エラー**: MUI コンポーネントの警告・エラー
+- **原因**: React 19 の StrictMode が MUI v7 と完全互換でない
+- **解決**: StrictMode を一時的に無効化
+- **コミット**: `0d0aeeb`
+
+**問題 5: Button component prop**
+- **エラー**: `component={Link}` が React 19 で動作しない
+- **原因**: React 19 の変更により、一部の prop が非推奨
+- **解決**: `useNavigate` フックを使用したナビゲーションに変更
+- **コミット**: `3a386e6`
+
+#### 実装プロセスへの影響
+
+**Day 4: フロントエンド基盤** のセットアップ手順に以下が追加されました:
+
+```bash
+# フロントエンドセットアップ（修正版）
+cd frontend
+
+# 1. package.json のバージョンを確認
+#    React: 19.1.1 (exact, ^ なし)
+#    MUI: 7.3.2 (exact, ^ なし)
+
+# 2. クリーンインストール
+rm -rf node_modules package-lock.json
+npm install
+
+# 3. 開発サーバー起動
+npm run dev
+
+# 4. ブラウザで動作確認
+# http://localhost:5173 でアプリが表示されることを確認
+# ThemeProvider エラーが出ないことを確認
+```
+
+#### 全コミット履歴
+
+| コミットハッシュ | 説明 |
+|---------------|------|
+| `a49038f` | fix(frontend): Add lazy loading for SchemaSettings component |
+| `3a386e6` | fix(frontend): Replace Button component prop with useNavigate hook |
+| `0d0aeeb` | fix(frontend): Remove React.StrictMode to resolve ThemeProvider error |
+| `8767559` | fix(frontend): Downgrade to stable React 19.1.1 and MUI 7.3.2 |
+| `1b91e1b` | fix(frontend): Fix infinite loading spinner when auth token is missing |
+| `b4d479c` | fix(frontend): Remove Redux store to resolve empty reducer error |
+
+#### 影響を受けるセクション
+
+**前提条件セクション**:
+- 厳密なバージョン要件を明記
+- exact versions の重要性を強調
+- アーキテクチャの変更（Redux 削除、StrictMode 無効化）を説明
+
+**トラブルシューティングセクション**:
+- React 19.x + MUI v7 互換性問題の詳細を追加
+- 5つの問題とその解決策を文書化
+- 再現可能な手順と回避策を提供
+
+**Day 4: フロントエンド基盤セクション**:
+- クリーンインストール手順を追加
+- バージョン確認ステップを追加
+- ThemeProvider エラーの確認ポイントを追加
+
+#### 将来の考慮事項
+
+**バージョンアップの方針:**
+- React 19.2.x 以降へのアップグレードは慎重に検討
+- MUI の React 19 完全サポートを待つ
+- アップグレード前に必ずローカル環境で検証
+
+**React.StrictMode の再有効化:**
+- MUI v7 が React 19 を完全サポートしたタイミングで検討
+- 再有効化前に全コンポーネントのテストを実施
+
+**Redux の再導入:**
+- Phase 3 以降でグローバルステート管理が必要になった場合に検討
+- 現時点では YAGNI 原則に従い導入しない
+
+#### 参考情報
+
+- **詳細な実装計画**: [phase-2-implementation-plan.md v1.0.1 セクション](./phase-2-implementation-plan.md#-更新履歴)
+- **デバッグ所要時間**: 約5時間
+- **検証環境**: Node.js 24.11.1, npm 10.9.0
+
+---
+
 **作成者**: Claude
 **最終更新**: 2025-11-19
+**バージョン**: 1.0.1
