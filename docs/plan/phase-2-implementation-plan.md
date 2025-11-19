@@ -3,7 +3,11 @@
 **作成日**: 2025-11-19
 **対象フェーズ**: Phase 2 - スキーマ管理機能（管理者向け）
 **見積もり期間**: 3-4日
-**前提条件**: Phase 1（バックエンド基盤）が完了していること
+**前提条件**:
+- Phase 1（バックエンド基盤）が完了していること
+- React v19.2.0 以上がインストールされていること
+- Material-UI v7.3.5 以上がインストールされていること
+- @dnd-kit がインストールされていること
 
 ---
 
@@ -110,7 +114,7 @@ frontend/src/
 │       └── FieldForm.tsx         # フィールド追加・編集フォーム
 ├── components/
 │   └── schema/
-│       ├── DraggableItem.tsx    # ドラッグ可能な項目
+│       ├── SortableItem.tsx     # ソート可能な項目 (@dnd-kit)
 │       ├── DataTypeSelector.tsx # データ型選択
 │       └── OptionsEditor.tsx    # オプション設定（JSON）
 ├── hooks/
@@ -209,7 +213,7 @@ Phase 2 では TDD（テスト駆動開発）を徹底します。各機能の�
 
 #### ステップ 9: ドラッグ&ドロップ機能（0.5日）
 
-- [ ] react-beautiful-dnd の実装
+- [ ] @dnd-kit の実装
 - [ ] display_order の自動更新
 - [ ] テスト
 
@@ -985,7 +989,23 @@ export default SchemaSettings;
 ```typescript
 // frontend/src/pages/SchemaSettings/CategoryList.tsx
 import React from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   List,
   ListItem,
@@ -995,7 +1015,7 @@ import {
   Chip,
 } from '@mui/material';
 import { Delete, Edit, DragHandle } from '@mui/icons-material';
-import { Schema, schemaApi } from '../../api/schemaApi';
+import { Schema, Category, schemaApi } from '../../api/schemaApi';
 
 interface CategoryListProps {
   schema: Schema;
@@ -1003,18 +1023,79 @@ interface CategoryListProps {
   token: string;
 }
 
-function CategoryList({ schema, onUpdate, token }: CategoryListProps) {
-  const handleDragEnd = async (result: any) => {
-    if (!result.destination) return;
+interface SortableItemProps {
+  category: Category;
+  onDelete: (id: string) => void;
+}
 
-    const items = Array.from(schema.categories);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+function SortableItem({ category, onDelete }: SortableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <ListItem
+      ref={setNodeRef}
+      style={style}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+        mb: 1,
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Box {...attributes} {...listeners} sx={{ mr: 2, cursor: 'grab' }}>
+        <DragHandle />
+      </Box>
+      <ListItemText
+        primary={category.name}
+        secondary={`${category.fields.length} フィールド - ${category.description}`}
+      />
+      <Chip label={`順序: ${category.displayOrder}`} size="small" sx={{ mr: 1 }} />
+      <IconButton edge="end" aria-label="edit">
+        <Edit />
+      </IconButton>
+      <IconButton edge="end" aria-label="delete" onClick={() => onDelete(category.id)}>
+        <Delete />
+      </IconButton>
+    </ListItem>
+  );
+}
+
+function CategoryList({ schema, onUpdate, token }: CategoryListProps) {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = schema.categories.findIndex((c) => c.id === active.id);
+    const newIndex = schema.categories.findIndex((c) => c.id === over.id);
+
+    const reorderedCategories = arrayMove(schema.categories, oldIndex, newIndex);
 
     // 各カテゴリの displayOrder を更新
-    for (let i = 0; i < items.length; i++) {
+    for (let i = 0; i < reorderedCategories.length; i++) {
       await schemaApi.updateCategory(
-        items[i].id,
+        reorderedCategories[i].id,
         { displayOrder: i + 1 },
         token
       );
@@ -1031,47 +1112,26 @@ function CategoryList({ schema, onUpdate, token }: CategoryListProps) {
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <Droppable droppableId="categories">
-        {(provided) => (
-          <List {...provided.droppableProps} ref={provided.innerRef}>
-            {schema.categories.map((category, index) => (
-              <Draggable key={category.id} draggableId={category.id} index={index}>
-                {(provided) => (
-                  <ListItem
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    sx={{
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: 1,
-                      mb: 1,
-                      bgcolor: 'background.paper',
-                    }}
-                  >
-                    <Box {...provided.dragHandleProps} sx={{ mr: 2 }}>
-                      <DragHandle />
-                    </Box>
-                    <ListItemText
-                      primary={category.name}
-                      secondary={`${category.fields.length} フィールド - ${category.description}`}
-                    />
-                    <Chip label={`順序: ${category.displayOrder}`} size="small" sx={{ mr: 1 }} />
-                    <IconButton edge="end" aria-label="edit">
-                      <Edit />
-                    </IconButton>
-                    <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(category.id)}>
-                      <Delete />
-                    </IconButton>
-                  </ListItem>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </List>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={schema.categories.map((c) => c.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <List>
+          {schema.categories.map((category) => (
+            <SortableItem
+              key={category.id}
+              category={category}
+              onDelete={handleDelete}
+            />
+          ))}
+        </List>
+      </SortableContext>
+    </DndContext>
   );
 }
 
@@ -1772,7 +1832,6 @@ describe('Schema API', () => {
 ```typescript
 // frontend/src/pages/SchemaSettings/CategoryList.test.tsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { DragDropContext } from 'react-beautiful-dnd';
 import CategoryList from './CategoryList';
 import { schemaApi } from '../../api/schemaApi';
 
@@ -1948,7 +2007,7 @@ Phase 2 完了後、以下のステップに進みます：
 
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Material-UI Documentation](https://mui.com/)
-- [react-beautiful-dnd Documentation](https://github.com/atlassian/react-beautiful-dnd)
+- [dnd-kit Documentation](https://docs.dndkit.com/)
 - [Jest Documentation](https://jestjs.io/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 
