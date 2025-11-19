@@ -1,6 +1,9 @@
-import { Container, Typography, Box } from '@mui/material';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { Container, Typography, Box, Button } from '@mui/material';
+import { Settings } from '@mui/icons-material';
+import SchemaSettings from './pages/SchemaSettings';
 
-function App() {
+function HomePage() {
   return (
     <Container maxWidth="lg">
       <Box
@@ -17,7 +20,7 @@ function App() {
           仕様書作成支援アプリ
         </Typography>
         <Typography variant="h6" color="text.secondary">
-          Phase 0: プロジェクト基盤構築完了
+          Phase 2: スキーマ管理機能実装完了
         </Typography>
         <Typography variant="body1" color="text.secondary">
           環境: {import.meta.env.MODE}
@@ -25,8 +28,29 @@ function App() {
         <Typography variant="body2" color="text.secondary">
           API URL: {import.meta.env.VITE_API_URL || 'Not configured'}
         </Typography>
+        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+          <Button
+            component={Link}
+            to="/settings/schema"
+            variant="contained"
+            startIcon={<Settings />}
+          >
+            スキーマ設定
+          </Button>
+        </Box>
       </Box>
     </Container>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/settings/schema" element={<SchemaSettings />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
