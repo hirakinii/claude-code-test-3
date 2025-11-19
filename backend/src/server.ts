@@ -2,7 +2,10 @@ import express, { Application } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import { healthRouter } from './routes/health';
-import { errorHandler } from './middleware/errorHandler';
+import authRouter from './routes/auth';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { generalLimiter, authLimiter } from './middleware/rateLimiter';
+import { config } from './config/env';
 import { logger } from './utils/logger';
 
 export function createServer(): Application {
@@ -13,7 +16,7 @@ export function createServer(): Application {
 
   // CORS configuration
   const corsOptions = {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: config.corsOrigin,
     credentials: true,
   };
   app.use(cors(corsOptions));
@@ -32,19 +35,15 @@ export function createServer(): Application {
     next();
   });
 
+  // Rate limiting middleware
+  app.use(generalLimiter);
+
   // Routes
   app.use('/health', healthRouter);
+  app.use('/api/auth', authLimiter, authRouter);
 
   // 404 handler
-  app.use((_req, res) => {
-    res.status(404).json({
-      success: false,
-      error: {
-        code: 'NOT_FOUND',
-        message: 'The requested resource was not found',
-      },
-    });
-  });
+  app.use(notFoundHandler);
 
   // Error handling middleware (must be last)
   app.use(errorHandler);
