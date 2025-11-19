@@ -3,12 +3,14 @@ import { config } from '../config/env';
 
 /**
  * 一般的なAPIエンドポイント用のレート制限
- * 15分あたり100リクエストまで
- * テスト環境では無効化
+ * 本番環境: 15分あたり100リクエストまで
+ * テスト環境: 1秒あたり1000リクエスト（緩い制限で動作確認のみ）
  */
 export const generalLimiter = rateLimit({
-  windowMs: config.rateLimitWindowMs,
-  max: config.rateLimitMaxRequests,
+  windowMs:
+    process.env.NODE_ENV === 'test' ? 1000 : config.rateLimitWindowMs,
+  max:
+    process.env.NODE_ENV === 'test' ? 1000 : config.rateLimitMaxRequests,
   message: {
     success: false,
     error: {
@@ -18,18 +20,16 @@ export const generalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // スキップ条件: テスト環境
-  skip: () => process.env.NODE_ENV === 'test',
 });
 
 /**
  * 認証エンドポイント用の厳格なレート制限
- * 15分あたり5リクエストまで
- * テスト環境では無効化
+ * 本番環境: 15分あたり5リクエストまで
+ * テスト環境: 1秒あたり100リクエスト（緩い制限で動作確認のみ）
  */
 export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15分
-  max: 5, // 15分あたり5リクエストまで
+  windowMs: process.env.NODE_ENV === 'test' ? 1000 : 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 100 : 5,
   message: {
     success: false,
     error: {
@@ -39,7 +39,6 @@ export const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // スキップ条件: ヘルスチェックエンドポイントまたはテスト環境
-  skip: (req) =>
-    req.path.startsWith('/health') || process.env.NODE_ENV === 'test',
+  // スキップ条件: ヘルスチェックエンドポイント
+  skip: (req) => req.path.startsWith('/health'),
 });
