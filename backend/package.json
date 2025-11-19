@@ -4,6 +4,7 @@
   "description": "仕様書作成支援アプリ - Backend API",
   "main": "dist/index.js",
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
