@@ -13,9 +13,21 @@ import {
 const prisma = new PrismaClient();
 
 describe('SchemaService', () => {
-  const testSchemaId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+  let testSchemaId: string;
   let createdCategoryIds: string[] = [];
   let createdFieldIds: string[] = [];
+
+  // テスト開始時にテスト専用スキーマを作成
+  beforeAll(async () => {
+    const testSchema = await prisma.schema.create({
+      data: {
+        schemaName: 'Test Schema for Unit Tests',
+        schemaVersion: '1.0.0-test',
+        status: 'DRAFT',
+      },
+    });
+    testSchemaId = testSchema.id;
+  });
 
   // テスト後のクリーンアップ
   afterEach(async () => {
@@ -40,7 +52,15 @@ describe('SchemaService', () => {
     createdCategoryIds = [];
   });
 
+  // テスト終了時にテスト専用スキーマを削除
   afterAll(async () => {
+    if (testSchemaId) {
+      try {
+        await prisma.schema.delete({ where: { id: testSchemaId } });
+      } catch (error) {
+        // 既に削除されている場合は無視
+      }
+    }
     await prisma.$disconnect();
   });
 

@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 describe('Schema API', () => {
   let adminToken: string;
   let creatorToken: string;
-  const testSchemaId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+  let testSchemaId: string;
   let createdCategoryIds: string[] = [];
   let createdFieldIds: string[] = [];
 
@@ -26,6 +26,16 @@ describe('Schema API', () => {
       password: 'Creator123!',
     });
     creatorToken = creatorLogin.body.data.token;
+
+    // テスト専用スキーマを作成
+    const testSchema = await prisma.schema.create({
+      data: {
+        schemaName: 'Test Schema for Integration Tests',
+        schemaVersion: '1.0.0-test',
+        status: 'DRAFT',
+      },
+    });
+    testSchemaId = testSchema.id;
   });
 
   afterEach(async () => {
@@ -50,6 +60,14 @@ describe('Schema API', () => {
   });
 
   afterAll(async () => {
+    // テスト専用スキーマを削除（カスケードでカテゴリ・フィールドも削除される）
+    if (testSchemaId) {
+      try {
+        await prisma.schema.delete({ where: { id: testSchemaId } });
+      } catch (error) {
+        // 既に削除されている場合は無視
+      }
+    }
     await prisma.$disconnect();
   });
 
