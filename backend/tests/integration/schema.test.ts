@@ -96,12 +96,12 @@ describe('Schema API', () => {
       const response = await request(app).get(`/api/schema/${testSchemaId}`);
 
       expect(response.status).toBe(401);
-      expect(response.body.error.code).toBe('AUTHENTICATION_REQUIRED');
+      expect(response.body.error.code).toBe('UNAUTHORIZED');
     });
 
     it('should return 404 for non-existent schema', async () => {
       const response = await request(app)
-        .get('/api/schema/non-existent-id')
+        .get('/api/schema/00000000-0000-0000-0000-000000000000')
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(response.status).toBe(404);
@@ -211,7 +211,7 @@ describe('Schema API', () => {
         .post('/api/schema/categories')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
-          schemaId: 'non-existent-schema',
+          schemaId: '00000000-0000-0000-0000-000000000000',
           name: 'Test',
           displayOrder: 1,
         });
@@ -309,7 +309,7 @@ describe('Schema API', () => {
 
     it('should return 404 for non-existent category', async () => {
       const response = await request(app)
-        .put('/api/schema/categories/non-existent-id')
+        .put('/api/schema/categories/00000000-0000-0000-0000-000000000000')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           name: 'Test',
@@ -398,7 +398,7 @@ describe('Schema API', () => {
 
     it('should return 404 for non-existent category', async () => {
       const response = await request(app)
-        .delete('/api/schema/categories/non-existent-id')
+        .delete('/api/schema/categories/00000000-0000-0000-0000-000000000000')
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(response.status).toBe(404);
@@ -559,7 +559,7 @@ describe('Schema API', () => {
         .post('/api/schema/fields')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
-          categoryId: 'non-existent-category',
+          categoryId: '00000000-0000-0000-0000-000000000000',
           fieldName: 'Test',
           dataType: 'TEXT',
           isRequired: false,
@@ -675,7 +675,7 @@ describe('Schema API', () => {
 
     it('should return 404 for non-existent field', async () => {
       const response = await request(app)
-        .put('/api/schema/fields/non-existent-id')
+        .put('/api/schema/fields/00000000-0000-0000-0000-000000000000')
         .set('Authorization', `Bearer ${adminToken}`)
         .send({
           fieldName: 'Test',
@@ -744,7 +744,7 @@ describe('Schema API', () => {
 
     it('should return 404 for non-existent field', async () => {
       const response = await request(app)
-        .delete('/api/schema/fields/non-existent-id')
+        .delete('/api/schema/fields/00000000-0000-0000-0000-000000000000')
         .set('Authorization', `Bearer ${adminToken}`);
 
       expect(response.status).toBe(404);
