@@ -102,7 +102,7 @@ describe('SchemaService', () => {
     });
 
     it('should throw error for non-existent schema', async () => {
-      await expect(getSchemaById('non-existent-id')).rejects.toThrow(
+      await expect(getSchemaById('00000000-0000-0000-0000-000000000000')).rejects.toThrow(
         'Schema not found'
       );
     });
@@ -144,7 +144,7 @@ describe('SchemaService', () => {
     it('should throw error for non-existent schema', async () => {
       await expect(
         createCategory({
-          schemaId: 'non-existent-id',
+          schemaId: '00000000-0000-0000-0000-000000000000',
           name: 'Test',
           displayOrder: 1,
         })
@@ -244,7 +244,7 @@ describe('SchemaService', () => {
 
     it('should throw error for non-existent category', async () => {
       await expect(
-        updateCategory('non-existent-id', { name: 'Test' })
+        updateCategory('00000000-0000-0000-0000-000000000000', { name: 'Test' })
       ).rejects.toThrow('Category not found');
     });
   });
@@ -298,7 +298,7 @@ describe('SchemaService', () => {
     });
 
     it('should throw error for non-existent category', async () => {
-      await expect(deleteCategory('non-existent-id')).rejects.toThrow(
+      await expect(deleteCategory('00000000-0000-0000-0000-000000000000')).rejects.toThrow(
         'Category not found'
       );
     });
@@ -448,7 +448,7 @@ describe('SchemaService', () => {
     it('should throw error for non-existent category', async () => {
       await expect(
         createField({
-          categoryId: 'non-existent-id',
+          categoryId: '00000000-0000-0000-0000-000000000000',
           fieldName: 'Test',
           dataType: 'TEXT',
           isRequired: false,
@@ -536,7 +536,7 @@ describe('SchemaService', () => {
 
     it('should throw error for non-existent field', async () => {
       await expect(
-        updateField('non-existent-id', { fieldName: 'Test' })
+        updateField('00000000-0000-0000-0000-000000000000', { fieldName: 'Test' })
       ).rejects.toThrow('Field not found');
     });
   });
@@ -574,7 +574,7 @@ describe('SchemaService', () => {
     });
 
     it('should throw error for non-existent field', async () => {
-      await expect(deleteField('non-existent-id')).rejects.toThrow(
+      await expect(deleteField('00000000-0000-0000-0000-000000000000')).rejects.toThrow(
         'Field not found'
       );
     });
