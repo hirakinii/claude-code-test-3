@@ -21,9 +21,7 @@ describe('SchemaService', () => {
   beforeAll(async () => {
     const testSchema = await prisma.schema.create({
       data: {
-        schemaName: 'Test Schema for Unit Tests',
-        schemaVersion: '1.0.0-test',
-        status: 'DRAFT',
+        name: 'Test Schema for Unit Tests',
       },
     });
     testSchemaId = testSchema.id;

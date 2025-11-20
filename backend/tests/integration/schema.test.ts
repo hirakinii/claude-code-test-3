@@ -30,9 +30,7 @@ describe('Schema API', () => {
     // テスト専用スキーマを作成
     const testSchema = await prisma.schema.create({
       data: {
-        schemaName: 'Test Schema for Integration Tests',
-        schemaVersion: '1.0.0-test',
-        status: 'DRAFT',
+        name: 'Test Schema for Integration Tests',
       },
     });
     testSchemaId = testSchema.id;
