@@ -42,7 +42,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: [
     {
-      command: 'cd ../backend && NODE_ENV=test npm run dev',
+      command: 'cd ../backend && npm run dev:e2e',
       url: 'http://localhost:3001/health',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
