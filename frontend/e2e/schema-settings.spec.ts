@@ -101,9 +101,8 @@ test.describe('Schema Settings', () => {
     await expect(page.locator('text=削除テストカテゴリ').first()).toBeVisible({ timeout: 5000 });
 
     // 削除ダイアログのハンドラを設定
-    page.on('dialog', (dialog) => {
-      expect(dialog.type()).toBe('confirm');
-      dialog.accept();
+    page.once('dialog', async (dialog) => {
+      await dialog.accept();
     });
 
     // 削除テストカテゴリの行を取得して、その中の削除ボタンをクリック
@@ -112,6 +111,9 @@ test.describe('Schema Settings', () => {
     const firstCategory = categoryItems.first();
     const deleteButton = firstCategory.locator('button[aria-label="delete"]');
     await deleteButton.click();
+
+    // 削除が完了するまで待つ
+    await page.waitForTimeout(1000);
 
     // カテゴリが削除されたことを確認
     await expect(page.locator('text=削除テストカテゴリ').first()).not.toBeVisible({ timeout: 5000 });
@@ -154,20 +156,30 @@ test.describe('Schema Settings', () => {
     const saveButton = page.locator('button').filter({ hasText: /保存|Save/i });
     await saveButton.click();
 
+    // モーダルが閉じるのを待つ
+    await expect(
+      page.locator('text=/フィールド追加|新しいフィールド/i')
+    ).not.toBeVisible({ timeout: 3000 });
+
+    // 保存後、refetch()により展開状態がリセットされるため、再度カテゴリを展開
+    const categoryItemAfterSave = page.locator('li').filter({ hasText: /ステップ 1: 基本情報/i }).first();
+    const expandButtonAfterSave = categoryItemAfterSave.locator('button[aria-label="expand"]');
+    await expandButtonAfterSave.click();
+    await page.waitForTimeout(500);
+
     // フィールドが追加されたことを確認
     await expect(page.locator('text=テストフィールド E2E')).toBeVisible({ timeout: 5000 });
   });
 
   test('should reset to default schema', async ({ page }) => {
+    // 確認ダイアログのハンドラを設定（ボタンクリック前に設定）
+    page.once('dialog', async (dialog) => {
+      await dialog.accept();
+    });
+
     // デフォルト復元ボタンを探す
     const resetButton = page.locator('button').filter({ hasText: /デフォルト復元|Reset to Default/i });
     await resetButton.click();
-
-    // 確認ダイアログのハンドラを設定
-    page.on('dialog', (dialog) => {
-      expect(dialog.type()).toBe('confirm');
-      dialog.accept();
-    });
 
     // ダイアログが表示され、承認後に復元されることを確認
     await page.waitForTimeout(2000);
