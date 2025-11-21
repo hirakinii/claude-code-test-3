@@ -41,6 +41,7 @@ interface CategoryListProps {
   schema: Schema;
   onUpdate: () => void;
   token: string;
+  onEdit?: (category: Category) => void;
 }
 
 interface SortableItemProps {
@@ -91,13 +92,13 @@ function SortableItem({
           secondary={
             <>
               {category.description && (
-                <Typography variant="body2" color="text.secondary">
+                <span style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(0, 0, 0, 0.6)' }}>
                   {category.description}
-                </Typography>
+                </span>
               )}
-              <Typography variant="caption" color="text.secondary">
+              <span style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(0, 0, 0, 0.6)' }}>
                 {category.fields.length} フィールド
-              </Typography>
+              </span>
             </>
           }
         />
@@ -142,7 +143,7 @@ function SortableItem({
   );
 }
 
-function CategoryList({ schema, onUpdate, token }: CategoryListProps) {
+function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: CategoryListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -197,8 +198,9 @@ function CategoryList({ schema, onUpdate, token }: CategoryListProps) {
   };
 
   const handleEdit = (category: Category) => {
-    // TODO: 編集モーダルを開く
-    console.log('Edit category:', category);
+    if (onEditCategory) {
+      onEditCategory(category);
+    }
   };
 
   if (!schema.categories || schema.categories.length === 0) {

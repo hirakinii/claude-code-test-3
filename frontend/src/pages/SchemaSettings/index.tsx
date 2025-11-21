@@ -13,6 +13,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSchema } from '../../hooks/useSchema';
 import CategoryList from './CategoryList';
 import CategoryForm from './CategoryForm';
+import { Category } from '../../api/schemaApi';
 
 const DEFAULT_SCHEMA_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 
@@ -21,6 +22,7 @@ function SchemaSettings() {
   const tokenValue = token || '';
   const { schema, loading, error, refetch } = useSchema(DEFAULT_SCHEMA_ID, tokenValue);
   const [openCategoryForm, setOpenCategoryForm] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | undefined>(undefined);
 
   const handleResetSchema = async () => {
     if (
@@ -37,6 +39,21 @@ function SchemaSettings() {
         alert('スキーマのリセットに失敗しました');
       }
     }
+  };
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setOpenCategoryForm(true);
+  };
+
+  const handleCloseCategoryForm = () => {
+    setOpenCategoryForm(false);
+    setEditingCategory(undefined);
+  };
+
+  const handleCategoryFormSuccess = () => {
+    handleCloseCategoryForm();
+    refetch();
   };
 
   if (loading) {
@@ -88,7 +105,7 @@ function SchemaSettings() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <SettingsIcon fontSize="large" color="primary" />
             <div>
-              <Typography variant="h4" component="h1">
+              <Typography variant="h4" component="h4">
                 スキーマ設定
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -102,7 +119,7 @@ function SchemaSettings() {
             onClick={handleResetSchema}
             color="warning"
           >
-            デフォルトにリセット
+            デフォルト復元
           </Button>
         </Box>
 
@@ -125,19 +142,22 @@ function SchemaSettings() {
               </Button>
             </Box>
 
-            <CategoryList schema={schema} onUpdate={refetch} token={tokenValue} />
+            <CategoryList
+              schema={schema}
+              onUpdate={refetch}
+              token={tokenValue}
+              onEdit={handleEditCategory}
+            />
           </Paper>
         )}
 
         <CategoryForm
           open={openCategoryForm}
-          onClose={() => setOpenCategoryForm(false)}
-          onSuccess={() => {
-            setOpenCategoryForm(false);
-            refetch();
-          }}
+          onClose={handleCloseCategoryForm}
+          onSuccess={handleCategoryFormSuccess}
           schemaId={DEFAULT_SCHEMA_ID}
           token={tokenValue}
+          category={editingCategory}
         />
       </Box>
     </Container>
