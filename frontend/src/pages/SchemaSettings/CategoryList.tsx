@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -165,8 +165,10 @@ function CategoryList({ schema, onUpdate, token }: CategoryListProps) {
     // 各カテゴリの displayOrder を更新
     try {
       for (let i = 0; i < reorderedCategories.length; i++) {
+        const category = reorderedCategories[i];
+        if (!category) continue;
         await schemaApi.updateCategory(
-          reorderedCategories[i].id,
+          category.id,
           { displayOrder: i + 1 },
           token
         );

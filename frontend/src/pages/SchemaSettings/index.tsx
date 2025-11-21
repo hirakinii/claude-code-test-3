@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Container,
   Typography,
@@ -9,6 +9,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Settings as SettingsIcon, Refresh } from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
 import { useSchema } from '../../hooks/useSchema';
 import CategoryList from './CategoryList';
 import CategoryForm from './CategoryForm';
@@ -16,9 +17,9 @@ import CategoryForm from './CategoryForm';
 const DEFAULT_SCHEMA_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 
 function SchemaSettings() {
-  // TODO: 実際は認証コンテキストから取得
-  const token = localStorage.getItem('authToken') || '';
-  const { schema, loading, error, refetch } = useSchema(DEFAULT_SCHEMA_ID, token);
+  const { token } = useAuth();
+  const tokenValue = token || '';
+  const { schema, loading, error, refetch } = useSchema(DEFAULT_SCHEMA_ID, tokenValue);
   const [openCategoryForm, setOpenCategoryForm] = useState(false);
 
   const handleResetSchema = async () => {
@@ -60,9 +61,9 @@ function SchemaSettings() {
               {error}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              現在、認証システムは実装中です。Phase 3 以降で実装予定です。
+              エラーが発生しました。もう一度お試しください。
             </Typography>
-            {token && (
+            {tokenValue && (
               <Button onClick={refetch} sx={{ mt: 2 }}>
                 再試行
               </Button>
@@ -124,7 +125,7 @@ function SchemaSettings() {
               </Button>
             </Box>
 
-            <CategoryList schema={schema} onUpdate={refetch} token={token} />
+            <CategoryList schema={schema} onUpdate={refetch} token={tokenValue} />
           </Paper>
         )}
 
@@ -136,7 +137,7 @@ function SchemaSettings() {
             refetch();
           }}
           schemaId={DEFAULT_SCHEMA_ID}
-          token={token}
+          token={tokenValue}
         />
       </Box>
     </Container>
