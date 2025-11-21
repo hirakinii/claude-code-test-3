@@ -30,10 +30,6 @@ jobs:
         ports:
           - 5432:5432
 
-    defaults:
-      run:
-        working-directory: ./backend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,26 +39,31 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
       - name: Generate Prisma Client
+        working-directory: ./backend
         run: npm run prisma:generate
 
       - name: Run database migrations
+        working-directory: ./backend
         run: npm run prisma:migrate:prod
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
 
       - name: Lint check
+        working-directory: ./backend
         run: npm run lint
 
       - name: Format check
+        working-directory: ./backend
         run: npm run format:check
 
       - name: Run tests
+        working-directory: ./backend
         run: npm test
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
@@ -82,10 +83,6 @@ jobs:
     name: Frontend - Build & Test
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./frontend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -95,23 +92,27 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
       - name: Lint check
+        working-directory: ./frontend
         run: npm run lint
 
       - name: Format check
+        working-directory: ./frontend
         run: npm run format:check
 
       - name: Build
+        working-directory: ./frontend
         run: npm run build
         env:
           VITE_API_URL: http://localhost:3001
 
       - name: Run tests
+        working-directory: ./frontend
         run: npm test
         env:
           CI: true
@@ -154,10 +155,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: package-lock.json
 
-      # Backend setup
-      - name: Install backend dependencies
-        working-directory: ./backend
+      # Install all dependencies
+      - name: Install dependencies
         run: npm ci
 
       - name: Generate Prisma Client
@@ -177,10 +178,6 @@ jobs:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
 
       # Frontend setup
-      - name: Install frontend dependencies
-        working-directory: ./frontend
-        run: npm ci
-
       - name: Install Playwright browsers
         working-directory: ./frontend
         run: npx playwright install --with-deps chromium
@@ -189,12 +186,11 @@ jobs:
       - name: Start backend server
         working-directory: ./backend
         run: |
-          npm run dev &
+          npm run dev:e2e &
           echo $! > backend.pid
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
           JWT_SECRET: test-secret-key-for-ci
-          NODE_ENV: development
           PORT: 3001
 
       # Wait for backend to be ready
