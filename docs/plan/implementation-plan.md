@@ -419,6 +419,39 @@ Phase 2 実装評価により、以下の状況が明らかになりました：
   - E2Eテスト自動実行設定
   - Playwright レポートのアーティファクトアップロード
 
+#### **2.5.5 E2Eテスト問題解決とクロスプラットフォーム対応**
+
+**実装日**: 2025-11-21
+
+**問題1: Playwright strict mode violation**
+- **原因**: 正規表現パターンが2つのエラーメッセージにマッチ
+- **修正**: 2つのアサーションに分割（`login.spec.ts:95`）
+
+**問題2: レート制限によるログイン失敗**
+- **原因**: バックエンドが開発モード（5回/15分）で起動していた
+- **解決策**:
+  - `backend/package.json`に`cross-env`パッケージを追加
+  - `dev:e2e`スクリプトを作成（`NODE_ENV=test`でテストモード起動）
+  - `frontend/playwright.config.ts`を修正（`npm run dev:e2e`を使用）
+- **効果**: テストモードのレート制限（100回/秒）により、全テストが正常実行可能に
+
+**問題3: Windows環境での環境変数設定**
+- **原因**: PowerShellで`NODE_ENV=test`構文が認識されない
+- **解決策**: `cross-env`パッケージによるクロスプラットフォーム対応
+- **対応環境**: Windows (PowerShell/CMD)、Linux、macOS
+
+**実装内容**:
+- [x] `login.spec.ts:95`のstrict mode violation修正
+- [x] `backend/package.json`に`cross-env`追加
+- [x] `backend/package.json`に`dev:e2e`スクリプト追加
+- [x] `frontend/playwright.config.ts`修正
+
+**コミット履歴**:
+- `a86e026` - chore: Add Playwright entries to .gitignore
+- `de938bc` - fix(e2e): Fix strict mode violation in login test
+- `35d04b3` - fix(e2e): Configure backend to run in test mode during E2E tests
+- `3fb6111` - feat(e2e): Add cross-platform support for E2E test environment
+
 ---
 
 ### **Phase 3: 仕様書管理（ダッシュボード）** (2-3日)
@@ -873,7 +906,7 @@ Phase 2 実装評価により、以下の状況が明らかになりました：
 | Phase 0 | プロジェクト基盤構築 | 1-2日 | ✅ 完了 |
 | Phase 1 | バックエンド基盤 | 3-5日 | ✅ 完了 |
 | Phase 2 | スキーマ管理機能 | 3-4日 | ✅ 完了 |
-| Phase 2.5 | ログイン機能とフロントエンドテスト完成 | 2日 | 🔄 進行中 |
+| Phase 2.5 | ログイン機能とフロントエンドテスト完成 | 2日 | ✅ 完了 |
 | Phase 3 | 仕様書管理（ダッシュボード） | 2-3日 | ⏸️ 未着手 |
 | Phase 4 | ウィザード機能（コア） | 5-7日 | ⏸️ 未着手 |
 | Phase 5 | レビュー・保存機能 | 3-4日 | ⏸️ 未着手 |
