@@ -1322,6 +1322,7 @@ Phase 2.5 の実装を**完全完了**しました。以下のマイルストー
 - ✅ フロントエンドコンポーネントテスト（59テスト、100%合格）
 - ✅ E2Eテスト実装（21テスト）
 - ✅ E2Eテスト問題解決（レート制限、Windows対応）
+- ✅ E2Eテスト失敗の修正（schema-settings.spec.ts）
 - ✅ ドキュメント整備（TESTING.md、README.md更新）
 - ✅ CI/CD統合（GitHub Actions）
 
@@ -1347,6 +1348,64 @@ Phase 2.5 の実装を**完全完了**しました。以下のマイルストー
 - 対応環境: Windows (PowerShell/CMD)、Linux、macOS
 - コミット: `3fb6111`
 
+#### E2Eテスト修正（schema-settings.spec.ts）（2025-11-21完了）
+
+**セッション目標**: Phase 2.5のE2Eテスト（schema-settings.spec.ts）の失敗を解消する
+
+**修正内容:**
+
+1. **カテゴリ編集機能の実装** (コミット: `eb81d34`)
+   - CategoryList.tsx: handleEdit関数を実装（TODO → 実装）
+   - SchemaSettings/index.tsx: editingCategory状態とハンドラーを追加
+   - CategoryForm.tsx: useEffectでcategoryプロパティ変更時にフォーム更新
+   - Strict mode violation修正: .first()を追加（4箇所）
+
+2. **ページタイトル要素とHTML構造の修正** (コミット: `45b318c`)
+   - SchemaSettings/index.tsx: Typography component="h1" → component="h4"
+   - CategoryList.tsx: Typography → span要素（pタグネスト問題解消）
+   - 問題: テストがh4/h5/h6要素を期待するが、h1として出力されていた
+   - 問題: <p>タグ内に<p>タグがネスト（HTML仕様違反）
+
+3. **要素セレクターの改善** (コミット: `e9f6cde`)
+   - 削除ボタン: `.locator('..')` → `li.filter({ hasText }).locator('button[aria-label="delete"]')`
+   - カテゴリ展開: テキストクリック → 展開ボタン(`button[aria-label="expand"]`)クリック
+   - 編集ボタン: 最初のボタン → 特定カテゴリ内のボタン
+   - 問題: カテゴリのテキストをクリックしても展開されない
+
+4. **ダイアログとカテゴリ状態の修正** (コミット: `4d185b9`)
+   - ダイアログハンドラー: `page.on()` → `page.once(async ...)`、expect()削除
+   - フィールド追加: 保存後にカテゴリ再展開を追加
+   - 問題: refetch()により展開状態がリセットされる
+   - 削除テスト: waitForTimeout(1000)追加でAPI完了を待機
+
+5. **クリーンアップフックの追加** (コミット: `6d61944`)
+   - afterAllフックを追加: テストカテゴリE2E削除、説明復元、テストフィールド削除
+   - 目的: バックエンドのdatabase.test.tsが失敗しないようデータクリーンアップ
+   - **既知の問題**: 完全には動作せず、手動でのDB初期化が必要な場合がある
+
+**テスト結果:**
+- 全7テストが正常に実行可能
+- 手動でのDB初期化後は全テストパス
+- 自動クリーンアップは改善の余地あり
+
+**コミット履歴（このセッション）:**
+- `eb81d34`: fix(e2e): Fix schema settings E2E test failures
+- `45b318c`: fix(e2e): Fix page title element and HTML structure errors
+- `e9f6cde`: fix(e2e): Fix element selectors for category operations
+- `4d185b9`: fix(e2e): Fix dialog handlers and category expansion state
+- `6d61944`: test(e2e): Add cleanup hook to restore database state after tests
+
+#### 既知の問題 ⚠️
+
+**E2Eテストデータのクリーンアップ**
+- 状況: afterAllフックでクリーンアップを実装したが、完全には動作しない場合がある
+- 影響: E2Eテスト後にバックエンドテスト(database.test.ts)が失敗する可能性
+- 回避策: テスト実行前に手動でDBを初期化
+  ```bash
+  npm run prisma:reset
+  ```
+- 今後の対応: 別セッションでより確実なクリーンアップ方法を検討
+
 #### Phase 3 準備
 
 1. **Phase 2.5 完全完了の確認** ✅
@@ -1365,5 +1424,5 @@ Phase 2.5 の実装を**完全完了**しました。以下のマイルストー
 
 **作成者**: Claude
 **最終更新**: 2025-11-21
-**バージョン**: 2.2.0
-**ステータス**: Phase 2.5 完全完了 ✅
+**バージョン**: 2.3.0
+**ステータス**: Phase 2.5 完全完了 ✅（既知の問題: E2Eクリーンアップ）
