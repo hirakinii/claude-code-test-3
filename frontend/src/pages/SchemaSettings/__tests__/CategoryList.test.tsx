@@ -150,7 +150,7 @@ describe('CategoryList', () => {
     });
   });
 
-  it('should expand/collapse category to show fields', () => {
+  it('should expand/collapse category to show fields', async () => {
     const schemaWithFields: Schema = {
       ...mockSchema,
       categories: [
@@ -189,8 +189,10 @@ describe('CategoryList', () => {
     // もう一度クリックして折りたたむ
     fireEvent.click(expandButton);
 
-    // FieldListが非表示になる
-    expect(screen.queryByText('FieldList Mock')).not.toBeInTheDocument();
+    // FieldListが非表示になる（Collapseアニメーションが完了するまで待つ）
+    await waitFor(() => {
+      expect(screen.queryByText('FieldList Mock')).not.toBeInTheDocument();
+    });
   });
 
   it('should show edit button', () => {
