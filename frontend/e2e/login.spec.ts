@@ -96,9 +96,13 @@ test.describe('Login Page', () => {
     // 空のまま送信
     await page.click('button[type="submit"]');
 
-    // バリデーションエラーが表示されることを確認
+    // バリデーションエラーが表示されることを確認（両方のエラーメッセージを個別にチェック）
     await expect(
-      page.locator('text=/メールアドレスは必須です|パスワードは必須です/i')
+      page.locator('text=/メールアドレスは必須です/i')
+    ).toBeVisible({ timeout: 3000 });
+
+    await expect(
+      page.locator('text=/パスワードは必須です/i')
     ).toBeVisible({ timeout: 3000 });
   });
 
