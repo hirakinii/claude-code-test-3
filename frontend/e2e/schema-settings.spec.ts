@@ -267,4 +267,83 @@ test.describe('Schema Settings', () => {
     // カテゴリが追加されていないことを確認
     await expect(page.locator('text=キャンセルされるカテゴリ')).not.toBeVisible();
   });
+
+  // テスト終了後にクリーンアップ
+  test.afterAll(async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    // 管理者としてログイン
+    await page.goto('/login');
+    await page.fill('input[id="email"]', 'admin@example.com');
+    await page.fill('input[id="password"]', 'Admin123!');
+    await page.click('button[type="submit"]');
+    await page.waitForURL(/\/(dashboard|settings\/schema)/, { timeout: 10000 });
+
+    // スキーマ設定画面へ遷移
+    await page.goto('/settings/schema');
+    await page.waitForLoadState('networkidle');
+
+    // 「テストカテゴリ E2E」を削除（存在する場合）
+    const testCategoryExists = await page.locator('text=テストカテゴリ E2E').first().isVisible().catch(() => false);
+    if (testCategoryExists) {
+      const categoryItems = page.locator('li').filter({ hasText: 'テストカテゴリ E2E' });
+      const count = await categoryItems.count();
+
+      // ダイアログハンドラーを設定
+      page.on('dialog', async (dialog) => {
+        await dialog.accept();
+      });
+
+      // すべての「テストカテゴリ E2E」を削除
+      for (let i = 0; i < count; i++) {
+        const categoryItem = page.locator('li').filter({ hasText: 'テストカテゴリ E2E' }).first();
+        const deleteButton = categoryItem.locator('button[aria-label="delete"]');
+        if (await deleteButton.isVisible().catch(() => false)) {
+          await deleteButton.click();
+          await page.waitForTimeout(1000);
+        }
+      }
+    }
+
+    // 「ステップ 1: 基本情報」の説明を元に戻す
+    const step1Category = page.locator('li').filter({ hasText: /ステップ 1: 基本情報/i }).first();
+    const step1EditButton = step1Category.locator('button[aria-label="edit"]');
+    await step1EditButton.click();
+
+    // モーダルが表示されるのを待つ
+    await page.waitForTimeout(1000);
+
+    // 説明を元に戻す
+    const descriptionInput = page.locator('textarea[name="description"]');
+    await descriptionInput.clear();
+    await descriptionInput.fill('仕様書の基本的な情報を入力してください');
+
+    // 保存
+    const saveButton = page.locator('button').filter({ hasText: /保存|Save/i });
+    await saveButton.click();
+    await page.waitForTimeout(1000);
+
+    // テストフィールド E2E を削除（存在する場合）
+    const step1CategoryAfter = page.locator('li').filter({ hasText: /ステップ 1: 基本情報/i }).first();
+    const expandButton = step1CategoryAfter.locator('button[aria-label="expand"]');
+    await expandButton.click();
+    await page.waitForTimeout(500);
+
+    const testFieldExists = await page.locator('text=テストフィールド E2E').isVisible().catch(() => false);
+    if (testFieldExists) {
+      page.on('dialog', async (dialog) => {
+        await dialog.accept();
+      });
+
+      const fieldItem = page.locator('li').filter({ hasText: 'テストフィールド E2E' }).first();
+      const fieldDeleteButton = fieldItem.locator('button[aria-label="delete"]');
+      if (await fieldDeleteButton.isVisible().catch(() => false)) {
+        await fieldDeleteButton.click();
+        await page.waitForTimeout(1000);
+      }
+    }
+
+    await context.close();
+  });
 });
