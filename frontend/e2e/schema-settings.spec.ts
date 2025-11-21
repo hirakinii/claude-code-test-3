@@ -63,14 +63,10 @@ test.describe('Schema Settings', () => {
   });
 
   test('should edit a category', async ({ page }) => {
-    // カテゴリを展開
-    const category = page.locator('text=/ステップ 1: 基本情報/i').first();
-    await category.click();
-    await page.waitForTimeout(500);
-
-    // 編集ボタンをクリック（aria-labelまたはtitleで探す）
-    const editButtons = page.locator('button[aria-label*="edit"], button[title*="編集"]');
-    await editButtons.first().click();
+    // ステップ 1: 基本情報のカテゴリを取得し、その中の編集ボタンをクリック
+    const categoryItem = page.locator('li').filter({ hasText: /ステップ 1: 基本情報/i }).first();
+    const editButton = categoryItem.locator('button[aria-label="edit"]');
+    await editButton.click();
 
     // モーダルが表示されることを確認
     await expect(
@@ -104,22 +100,17 @@ test.describe('Schema Settings', () => {
 
     await expect(page.locator('text=削除テストカテゴリ').first()).toBeVisible({ timeout: 5000 });
 
-    // 作成したカテゴリを展開
-    await page.locator('text=削除テストカテゴリ').first().click();
-    await page.waitForTimeout(500);
-
     // 削除ダイアログのハンドラを設定
     page.on('dialog', (dialog) => {
       expect(dialog.type()).toBe('confirm');
       dialog.accept();
     });
 
-    // 削除ボタンをクリック
-    const deleteButtons = page.locator('button[aria-label*="delete"], button[title*="削除"]');
-
-    // 削除テストカテゴリに対応する削除ボタンを探す
-    const categoryRow = page.locator('text=削除テストカテゴリ').first().locator('..');
-    const deleteButton = categoryRow.locator('button[aria-label*="delete"], button[title*="削除"]').first();
+    // 削除テストカテゴリの行を取得して、その中の削除ボタンをクリック
+    // ListItemの中の削除ボタンを探す
+    const categoryItems = page.locator('li').filter({ hasText: '削除テストカテゴリ' });
+    const firstCategory = categoryItems.first();
+    const deleteButton = firstCategory.locator('button[aria-label="delete"]');
     await deleteButton.click();
 
     // カテゴリが削除されたことを確認
@@ -127,9 +118,10 @@ test.describe('Schema Settings', () => {
   });
 
   test('should create a new field in a category', async ({ page }) => {
-    // カテゴリを展開
-    const category = page.locator('text=/ステップ 1: 基本情報/i').first();
-    await category.click();
+    // カテゴリを展開（展開ボタンをクリック）
+    const categoryItem = page.locator('li').filter({ hasText: /ステップ 1: 基本情報/i }).first();
+    const expandButton = categoryItem.locator('button[aria-label="expand"]');
+    await expandButton.click();
     await page.waitForTimeout(500);
 
     // フィールド追加ボタンを探す
@@ -214,9 +206,10 @@ test.describe('Schema Settings', () => {
   });
 
   test('should validate field form with required fields', async ({ page }) => {
-    // カテゴリを展開
-    const category = page.locator('text=/ステップ 1: 基本情報/i').first();
-    await category.click();
+    // カテゴリを展開（展開ボタンをクリック）
+    const categoryItem = page.locator('li').filter({ hasText: /ステップ 1: 基本情報/i }).first();
+    const expandButton = categoryItem.locator('button[aria-label="expand"]');
+    await expandButton.click();
     await page.waitForTimeout(500);
 
     // フィールド追加ボタンをクリック
