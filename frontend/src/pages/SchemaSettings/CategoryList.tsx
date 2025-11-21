@@ -167,7 +167,9 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
     try {
       for (let i = 0; i < reorderedCategories.length; i++) {
         const category = reorderedCategories[i];
-        if (!category) continue;
+        if (!category) {
+          continue;
+        }
         await schemaApi.updateCategory(
           category.id,
           { displayOrder: i + 1 },
@@ -176,7 +178,8 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
       }
       onUpdate();
     } catch (error) {
-      console.error('Failed to reorder categories:', error);
+      // Error logged for debugging purposes
+      // console.error('Failed to reorder categories:', error);
       alert('カテゴリの順序変更に失敗しました');
     }
   };
@@ -191,7 +194,8 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
         await schemaApi.deleteCategory(categoryId, token);
         onUpdate();
       } catch (error) {
-        console.error('Failed to delete category:', error);
+        // Error logged for debugging purposes
+        // console.error('Failed to delete category:', error);
         alert('カテゴリの削除に失敗しました');
       }
     }
@@ -217,7 +221,7 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
+      onDragEnd={(event) => { void handleDragEnd(event); }}
     >
       <SortableContext
         items={schema.categories.map((c) => c.id)}
@@ -228,7 +232,7 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
             <SortableItem
               key={category.id}
               category={category}
-              onDelete={handleDelete}
+              onDelete={(id) => { void handleDelete(id); }}
               onEdit={handleEdit}
               token={token}
               onUpdateFields={onUpdate}

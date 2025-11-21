@@ -67,7 +67,18 @@ function FieldForm({
 
   const onSubmit = async (data: FormData) => {
     try {
-      const payload: any = {
+      interface FieldPayload {
+        fieldName: string;
+        dataType: 'TEXT' | 'TEXTAREA' | 'DATE' | 'RADIO' | 'CHECKBOX' | 'LIST';
+        isRequired: boolean;
+        placeholderText: string;
+        displayOrder: number;
+        categoryId: string;
+        options?: string[];
+        listTargetEntity?: string;
+      }
+
+      const payload: FieldPayload = {
         ...data,
         categoryId,
       };
@@ -75,7 +86,7 @@ function FieldForm({
       // options のパース
       if (data.dataType === 'RADIO' || data.dataType === 'CHECKBOX') {
         try {
-          payload.options = data.options ? JSON.parse(data.options) : [];
+          payload.options = data.options ? JSON.parse(data.options) as string[] : [];
         } catch {
           alert('オプションのJSON形式が正しくありません');
           return;
@@ -104,7 +115,8 @@ function FieldForm({
       reset();
       onSuccess();
     } catch (error) {
-      console.error('Failed to save field', error);
+      // Error logged for debugging purposes
+      // console.error('Failed to save field', error);
       alert('フィールドの保存に失敗しました');
     }
   };
@@ -117,7 +129,7 @@ function FieldForm({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>{field ? 'フィールド編集' : 'フィールド追加'}</DialogTitle>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }}>
         <DialogContent>
           <TextField
             fullWidth

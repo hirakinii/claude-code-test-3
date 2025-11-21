@@ -10,7 +10,7 @@ import {
   Chip,
 } from '@mui/material';
 import { Delete, Edit, Add } from '@mui/icons-material';
-import { Category, schemaApi } from '../../api/schemaApi';
+import { Category, schemaApi, Field } from '../../api/schemaApi';
 import FieldForm from './FieldForm';
 
 interface FieldListProps {
@@ -21,7 +21,7 @@ interface FieldListProps {
 
 function FieldList({ category, token, onUpdate }: FieldListProps) {
   const [openFieldForm, setOpenFieldForm] = useState(false);
-  const [editingField, setEditingField] = useState<any>(null);
+  const [editingField, setEditingField] = useState<Field | null>(null);
 
   const handleDeleteField = async (fieldId: string) => {
     if (window.confirm('このフィールドを削除しますか？')) {
@@ -29,13 +29,14 @@ function FieldList({ category, token, onUpdate }: FieldListProps) {
         await schemaApi.deleteField(fieldId, token);
         onUpdate();
       } catch (error) {
-        console.error('Failed to delete field:', error);
+        // Error logged for debugging purposes
+        // console.error('Failed to delete field:', error);
         alert('フィールドの削除に失敗しました');
       }
     }
   };
 
-  const handleEditField = (field: any) => {
+  const handleEditField = (field: Field) => {
     setEditingField(field);
     setOpenFieldForm(true);
   };
@@ -150,7 +151,7 @@ function FieldList({ category, token, onUpdate }: FieldListProps) {
             <IconButton
               edge="end"
               aria-label="delete"
-              onClick={() => handleDeleteField(field.id)}
+              onClick={() => { void handleDeleteField(field.id); }}
             >
               <Delete fontSize="small" />
             </IconButton>

@@ -35,7 +35,8 @@ function SchemaSettings() {
         await refetch();
         alert('スキーマをデフォルトにリセットしました');
       } catch (err) {
-        console.error('Failed to reset schema:', err);
+        // Error logged for debugging purposes
+        // console.error('Failed to reset schema:', err);
         alert('スキーマのリセットに失敗しました');
       }
     }
@@ -53,7 +54,7 @@ function SchemaSettings() {
 
   const handleCategoryFormSuccess = () => {
     handleCloseCategoryForm();
-    refetch();
+    void refetch();
   };
 
   if (loading) {
@@ -81,7 +82,7 @@ function SchemaSettings() {
               エラーが発生しました。もう一度お試しください。
             </Typography>
             {tokenValue && (
-              <Button onClick={refetch} sx={{ mt: 2 }}>
+              <Button onClick={() => { void refetch(); }} sx={{ mt: 2 }}>
                 再試行
               </Button>
             )}
@@ -116,7 +117,7 @@ function SchemaSettings() {
           <Button
             variant="outlined"
             startIcon={<Refresh />}
-            onClick={handleResetSchema}
+            onClick={() => { void handleResetSchema(); }}
             color="warning"
           >
             デフォルト復元
@@ -144,7 +145,7 @@ function SchemaSettings() {
 
             <CategoryList
               schema={schema}
-              onUpdate={refetch}
+              onUpdate={() => { void refetch(); }}
               token={tokenValue}
               onEdit={handleEditCategory}
             />

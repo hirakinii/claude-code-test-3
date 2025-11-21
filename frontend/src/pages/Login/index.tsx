@@ -37,7 +37,7 @@ function Login() {
       await login(data.email, data.password);
 
       // ログイン成功後、スキーマ設定画面へ遷移
-      navigate('/settings/schema');
+      void navigate('/settings/schema');
     } catch (err) {
       setError('ログインに失敗しました。メールアドレスとパスワードを確認してください。');
     } finally {
@@ -66,7 +66,7 @@ function Login() {
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={(e) => { void handleSubmit(onSubmit)(e); }} sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               fullWidth

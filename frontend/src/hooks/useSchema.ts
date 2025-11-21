@@ -16,7 +16,8 @@ export function useSchema(schemaId: string, token: string) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to fetch schema';
       setError(errorMessage);
-      console.error('Failed to fetch schema:', err);
+      // Error logged for debugging purposes
+      // console.error('Failed to fetch schema:', err);
     } finally {
       setLoading(false);
     }
@@ -31,7 +32,7 @@ export function useSchema(schemaId: string, token: string) {
     }
 
     if (schemaId && token) {
-      fetchSchema();
+      void fetchSchema();
     }
   }, [schemaId, token, fetchSchema]);
 

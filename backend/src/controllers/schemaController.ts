@@ -10,13 +10,20 @@ import {
   resetSchemaToDefault,
 } from '../services/schemaService';
 import { logger } from '../utils/logger';
+import {
+  CreateCategoryRequestBody,
+  UpdateCategoryRequestBody,
+  CreateFieldRequestBody,
+  UpdateFieldRequestBody,
+  ResetSchemaRequestBody,
+} from '../types/requests';
 
 /**
  * スキーマ取得ハンドラー
  * GET /api/schema/:schemaId
  */
 export async function getSchemaHandler(
-  req: Request,
+  req: Request<{ schemaId: string }>,
   res: Response
 ): Promise<void> {
   try {
@@ -72,7 +79,7 @@ export async function getSchemaHandler(
  * POST /api/schema/categories
  */
 export async function createCategoryHandler(
-  req: Request,
+  req: Request<object, object, CreateCategoryRequestBody>,
   res: Response
 ): Promise<void> {
   try {
@@ -144,7 +151,7 @@ export async function createCategoryHandler(
  * PUT /api/schema/categories/:id
  */
 export async function updateCategoryHandler(
-  req: Request,
+  req: Request<{ id: string }, object, UpdateCategoryRequestBody>,
   res: Response
 ): Promise<void> {
   try {
@@ -212,7 +219,7 @@ export async function updateCategoryHandler(
  * DELETE /api/schema/categories/:id
  */
 export async function deleteCategoryHandler(
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response
 ): Promise<void> {
   try {
@@ -267,7 +274,7 @@ export async function deleteCategoryHandler(
  * POST /api/schema/fields
  */
 export async function createFieldHandler(
-  req: Request,
+  req: Request<object, object, CreateFieldRequestBody>,
   res: Response
 ): Promise<void> {
   try {
@@ -368,7 +375,7 @@ export async function createFieldHandler(
  * PUT /api/schema/fields/:id
  */
 export async function updateFieldHandler(
-  req: Request,
+  req: Request<{ id: string }, object, UpdateFieldRequestBody>,
   res: Response
 ): Promise<void> {
   try {
@@ -466,7 +473,7 @@ export async function updateFieldHandler(
  * DELETE /api/schema/fields/:id
  */
 export async function deleteFieldHandler(
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response
 ): Promise<void> {
   try {
@@ -521,7 +528,7 @@ export async function deleteFieldHandler(
  * POST /api/schema/reset
  */
 export async function resetSchemaHandler(
-  req: Request,
+  req: Request<object, object, ResetSchemaRequestBody>,
   res: Response
 ): Promise<void> {
   try {
