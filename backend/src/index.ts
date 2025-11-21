@@ -5,7 +5,7 @@ import { logger } from './utils/logger';
 
 const PORT = process.env.PORT || 3001;
 
-async function main(): Promise<void> {
+function main(): void {
   try {
     const app = createServer();
 

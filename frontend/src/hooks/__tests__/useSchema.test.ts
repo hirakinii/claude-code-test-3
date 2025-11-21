@@ -90,7 +90,7 @@ describe('useSchema', () => {
 
     // refetch を呼び出し
     act(() => {
-      result.current.refetch();
+      void result.current.refetch();
     });
 
     await waitFor(() => {
@@ -143,7 +143,7 @@ describe('useSchema', () => {
 
     // refetch を呼び出し
     act(() => {
-      result.current.refetch();
+      void result.current.refetch();
     });
 
     // loadingがtrueに戻ることを確認

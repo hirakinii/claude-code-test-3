@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, MemoryRouter } from 'react-router-dom';
 import ProtectedRoute from '../ProtectedRoute';
 import * as AuthContext from '../../contexts/AuthContext';
 
@@ -87,10 +87,6 @@ describe('ProtectedRoute', () => {
       isAdmin: false,
     });
 
-    // MemoryRouter を使用して初期パスを設定
-    const { BrowserRouter: _, ...rest } = require('react-router-dom');
-    const { MemoryRouter } = rest;
-
     render(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
@@ -122,8 +118,6 @@ describe('ProtectedRoute', () => {
       isAuthenticated: true,
       isAdmin: true,
     });
-
-    const { MemoryRouter } = require('react-router-dom');
 
     render(
       <MemoryRouter initialEntries={['/']}>

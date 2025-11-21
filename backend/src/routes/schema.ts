@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { requireAuth } from '../middleware/auth';
 import { requireAdmin } from '../middleware/rbac';
 import {
@@ -19,19 +19,19 @@ router.use(requireAuth);
 router.use(requireAdmin);
 
 // スキーマ取得
-router.get('/:schemaId', getSchemaHandler);
+router.get('/:schemaId', getSchemaHandler as RequestHandler);
 
 // カテゴリCRUD
-router.post('/categories', createCategoryHandler);
-router.put('/categories/:id', updateCategoryHandler);
-router.delete('/categories/:id', deleteCategoryHandler);
+router.post('/categories', createCategoryHandler as RequestHandler);
+router.put('/categories/:id', updateCategoryHandler as RequestHandler);
+router.delete('/categories/:id', deleteCategoryHandler as RequestHandler);
 
 // フィールドCRUD
-router.post('/fields', createFieldHandler);
-router.put('/fields/:id', updateFieldHandler);
-router.delete('/fields/:id', deleteFieldHandler);
+router.post('/fields', createFieldHandler as RequestHandler);
+router.put('/fields/:id', updateFieldHandler as RequestHandler);
+router.delete('/fields/:id', deleteFieldHandler as RequestHandler);
 
 // デフォルト復元
-router.post('/reset', resetSchemaHandler);
+router.post('/reset', resetSchemaHandler as RequestHandler);
 
 export default router;
