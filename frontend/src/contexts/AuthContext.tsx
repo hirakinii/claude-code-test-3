@@ -9,7 +9,8 @@ import { authApi } from '../api/authApi';
 interface User {
   id: string;
   email: string;
-  role: 'ADMINISTRATOR' | 'CREATOR';
+  fullName: string;
+  roles: string[];
 }
 
 interface AuthContextType {
@@ -65,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     isAuthenticated: !!token,
-    isAdmin: user?.role === 'ADMINISTRATOR',
+    isAdmin: user?.roles.includes('ADMINISTRATOR') ?? false,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

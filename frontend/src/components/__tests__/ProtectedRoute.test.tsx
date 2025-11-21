@@ -20,7 +20,7 @@ describe('ProtectedRoute', () => {
 
   it('should render children when user is authenticated', () => {
     vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-      user: { id: '1', email: 'test@example.com', role: 'CREATOR' },
+      user: { id: '1', email: 'test@example.com', fullName: 'Test User', roles: ['CREATOR'] },
       token: 'test-token',
       login: vi.fn(),
       logout: vi.fn(),
@@ -79,7 +79,7 @@ describe('ProtectedRoute', () => {
 
   it('should redirect to unauthorized page when user is not admin but admin is required', () => {
     vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-      user: { id: '1', email: 'creator@example.com', role: 'CREATOR' },
+      user: { id: '1', email: 'creator@example.com', fullName: 'Creator User', roles: ['CREATOR'] },
       token: 'test-token',
       login: vi.fn(),
       logout: vi.fn(),
@@ -115,7 +115,7 @@ describe('ProtectedRoute', () => {
 
   it('should render children when user is admin and admin is required', () => {
     vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-      user: { id: '1', email: 'admin@example.com', role: 'ADMINISTRATOR' },
+      user: { id: '1', email: 'admin@example.com', fullName: 'Admin User', roles: ['ADMINISTRATOR', 'CREATOR'] },
       token: 'test-token',
       login: vi.fn(),
       logout: vi.fn(),

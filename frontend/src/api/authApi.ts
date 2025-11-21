@@ -19,7 +19,8 @@ export interface LoginResponse {
     user: {
       id: string;
       email: string;
-      role: 'ADMINISTRATOR' | 'CREATOR';
+      fullName: string;
+      roles: string[];
     };
   };
 }
