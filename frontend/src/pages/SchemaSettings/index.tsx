@@ -105,7 +105,7 @@ function SchemaSettings() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <SettingsIcon fontSize="large" color="primary" />
             <div>
-              <Typography variant="h4" component="h1">
+              <Typography variant="h4" component="h4">
                 スキーマ設定
               </Typography>
               <Typography variant="body2" color="text.secondary">
