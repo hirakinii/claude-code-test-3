@@ -2082,12 +2082,14 @@ Phase 2 を完了とみなす基準：
   - 39 integration tests for Schema API endpoints
   - All authentication and authorization tests passing
   - Request/response validation tests passing
-- [ ] フロントエンドコンポーネントテストがパスする ⏳ **PENDING**
-  - Blocked by login page implementation
-  - Will be implemented in Phase 2.5 or Phase 3
-- [ ] E2Eテストの主要フローがパスする ⏳ **PENDING**
-  - Requires login page and full UI implementation
-  - Planned for later phase
+- [x] フロントエンドコンポーネントテストがパスする ✅ **COMPLETED** (Phase 2.5)
+  - 59 component tests (Login, ProtectedRoute, useSchema, CategoryList, CategoryForm, FieldList, FieldForm)
+  - Test coverage: 85-100% for main components
+  - All tests passing
+- [x] E2Eテストの主要フローがパスする ✅ **COMPLETED** (Phase 2.5)
+  - 21 E2E tests (login: 10 tests, schema-settings: 11 tests)
+  - All tests passing
+  - API-based cleanup implemented for reliable test isolation
 
 ### セキュリティ
 

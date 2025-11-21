@@ -648,9 +648,11 @@ git commit -m "test(schema): Add integration tests for schema API"
 
 ## 次のステップ
 
-### Phase 2 実装完了後の状況（2025-11-20） ✅
+### Phase 2.5 実装完了状況（2025-11-21） ✅
 
-**完了した作業（75%）:**
+**完了した作業（100%）:**
+
+**Phase 2 (Backend & Frontend UI):**
 1. ✅ バックエンドAPI実装 (Schema, Category, Field CRUD - 8エンドポイント、904行)
 2. ✅ ユニットテスト (39 tests, 80%+ coverage)
 3. ✅ 統合テスト (39 tests, authentication/authorization)
@@ -658,21 +660,28 @@ git commit -m "test(schema): Add integration tests for schema API"
 5. ✅ フロントエンドUI実装 (7ファイル、~1,159行)
 6. ✅ ドラッグ&ドロップ機能 (@dnd-kit)
 7. ✅ React 19.x + MUI v7 互換性問題の解決
-8. ✅ 実装計画書・クイックスタートガイドの更新
-9. ✅ Phase 2 実装状況評価レポート作成
 
-**残っている作業（25%）:**
-1. ⏳ ログインページの実装 (Phase 2.5で対応予定)
-2. ⏳ フロントエンドコンポーネントテスト (CategoryList.test.tsx など)
-3. ⏳ E2Eテスト (Playwright)
+**Phase 2.5 (Login & Tests):**
+8. ✅ ログインページの実装 (Login, AuthContext, ProtectedRoute)
+9. ✅ フロントエンドコンポーネントテスト (59 tests, 85-100% coverage)
+10. ✅ E2Eテスト (21 tests: login 10, schema-settings 11)
+11. ✅ E2Eテストクリーンアップ問題の解決 (UIベース→APIベース) **NEW**
+12. ✅ 実装計画書・ドキュメント更新完了
+13. ✅ CI/CD統合 (GitHub Actions)
+
+**完了基準達成:**
+- ✅ 全機能実装完了 (100%)
+- ✅ 全テストパス (Backend: 78 tests, Frontend: 59 tests, E2E: 21 tests)
+- ✅ テストカバレッジ目標達成 (80%+)
+- ✅ E2Eテストの信頼性向上 (API-based cleanup)
 
 **次のアクション:**
-1. ✅ Phase 2 実装状況評価レポート作成完了
-2. ✅ 実装計画書の完了チェックリスト更新完了
-3. ✅ クイックスタートガイドの完了チェックリスト更新完了
-4. 🔄 変更をcommit & push
-5. 🔄 Phase 2.5 実装計画の提案
-6. リポジトリオーナーにレビュー依頼 (バックエンド・フロントエンドUI部分)
+1. ✅ E2Eクリーンアップ問題解決完了
+2. ✅ ドキュメント更新完了
+3. 🔄 変更をcommit & push
+4. ✅ Phase 2/2.5 完全完了
+5. リポジトリオーナーにレビュー依頼
+6. Phase 3 実装計画の策定
 
 ---
 
