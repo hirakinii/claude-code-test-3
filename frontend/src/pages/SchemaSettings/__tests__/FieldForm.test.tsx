@@ -30,7 +30,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     expect(screen.getByText('フィールド追加')).toBeInTheDocument();
@@ -61,7 +61,7 @@ describe('FieldForm', () => {
         categoryId={mockCategoryId}
         token={mockToken}
         field={field}
-      />
+      />,
     );
 
     expect(screen.getByText('フィールド編集')).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     const submitButton = screen.getByRole('button', { name: '保存' });
@@ -104,7 +104,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     // データ型をRADIOに変更 (最初のcomboboxがデータ型のSelect)
@@ -115,7 +115,9 @@ describe('FieldForm', () => {
 
     // オプションフィールドが表示される
     await waitFor(() => {
-      expect(screen.getByLabelText('オプション（JSON配列）')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('オプション（JSON配列）'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -129,18 +131,22 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     // データ型をCHECKBOXに変更
     const dataTypeSelect = screen.getAllByRole('combobox')[0];
     await user.click(dataTypeSelect);
-    const checkboxOption = screen.getByRole('option', { name: 'チェックボックス' });
+    const checkboxOption = screen.getByRole('option', {
+      name: 'チェックボックス',
+    });
     await user.click(checkboxOption);
 
     // オプションフィールドが表示される
     await waitFor(() => {
-      expect(screen.getByLabelText('オプション（JSON配列）')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('オプション（JSON配列）'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -154,7 +160,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     // データ型をLISTに変更
@@ -180,7 +186,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'Test Field');
@@ -192,7 +198,9 @@ describe('FieldForm', () => {
     await user.click(radioOption);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('オプション（JSON配列）')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('オプション（JSON配列）'),
+      ).toBeInTheDocument();
     });
 
     // 不正なJSON形式を入力
@@ -203,7 +211,9 @@ describe('FieldForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('オプションのJSON形式が正しくありません');
+      expect(window.alert).toHaveBeenCalledWith(
+        'オプションのJSON形式が正しくありません',
+      );
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
   });
@@ -218,7 +228,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'Test Field');
@@ -238,7 +248,9 @@ describe('FieldForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('動的リストでは参照先エンティティは必須です')).toBeInTheDocument();
+      expect(
+        screen.getByText('動的リストでは参照先エンティティは必須です'),
+      ).toBeInTheDocument();
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
   });
@@ -264,7 +276,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'New Field');
@@ -283,7 +295,7 @@ describe('FieldForm', () => {
           displayOrder: 1,
           categoryId: mockCategoryId,
         }),
-        mockToken
+        mockToken,
       );
       expect(mockOnSuccess).toHaveBeenCalled();
     });
@@ -311,7 +323,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'New Radio Field');
@@ -323,12 +335,16 @@ describe('FieldForm', () => {
     await user.click(radioOption);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('オプション（JSON配列）')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('オプション（JSON配列）'),
+      ).toBeInTheDocument();
     });
 
     // JSONオプションを入力
     const optionsInput = screen.getByLabelText('オプション（JSON配列）');
-    fireEvent.change(optionsInput, { target: { value: '["Option 1", "Option 2"]' } });
+    fireEvent.change(optionsInput, {
+      target: { value: '["Option 1", "Option 2"]' },
+    });
 
     // 必須項目チェック
     await user.click(screen.getByLabelText('必須項目'));
@@ -345,7 +361,7 @@ describe('FieldForm', () => {
           options: ['Option 1', 'Option 2'],
           categoryId: mockCategoryId,
         }),
-        mockToken
+        mockToken,
       );
       expect(mockOnSuccess).toHaveBeenCalled();
     });
@@ -378,7 +394,7 @@ describe('FieldForm', () => {
         categoryId={mockCategoryId}
         token={mockToken}
         field={field}
-      />
+      />,
     );
 
     const fieldNameInput = screen.getByLabelText('フィールド名');
@@ -396,7 +412,7 @@ describe('FieldForm', () => {
           dataType: 'TEXT',
           isRequired: true,
         }),
-        mockToken
+        mockToken,
       );
       expect(mockOnSuccess).toHaveBeenCalled();
     });
@@ -414,7 +430,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'New Field');
@@ -423,7 +439,9 @@ describe('FieldForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('フィールドの保存に失敗しました');
+      expect(window.alert).toHaveBeenCalledWith(
+        'フィールドの保存に失敗しました',
+      );
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
   });
@@ -438,7 +456,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'New Field');

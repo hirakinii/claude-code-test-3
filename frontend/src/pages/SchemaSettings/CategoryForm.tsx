@@ -93,10 +93,12 @@ function CategoryForm({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {category ? 'カテゴリ編集' : 'カテゴリ追加'}
-      </DialogTitle>
-      <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }}>
+      <DialogTitle>{category ? 'カテゴリ編集' : 'カテゴリ追加'}</DialogTitle>
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
+      >
         <DialogContent>
           <TextField
             fullWidth

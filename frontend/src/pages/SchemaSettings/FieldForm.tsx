@@ -86,7 +86,9 @@ function FieldForm({
       // options のパース
       if (data.dataType === 'RADIO' || data.dataType === 'CHECKBOX') {
         try {
-          payload.options = data.options ? JSON.parse(data.options) as string[] : [];
+          payload.options = data.options
+            ? (JSON.parse(data.options) as string[])
+            : [];
         } catch {
           alert('オプションのJSON形式が正しくありません');
           return;
@@ -129,7 +131,11 @@ function FieldForm({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>{field ? 'フィールド編集' : 'フィールド追加'}</DialogTitle>
-      <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }}>
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
+      >
         <DialogContent>
           <TextField
             fullWidth
@@ -217,7 +223,8 @@ function FieldForm({
                 fullWidth
                 label="オプション（JSON配列）"
                 {...register('options', {
-                  required: 'ラジオボタン/チェックボックスではオプションは必須です',
+                  required:
+                    'ラジオボタン/チェックボックスではオプションは必須です',
                 })}
                 error={!!errors.options}
                 helperText={

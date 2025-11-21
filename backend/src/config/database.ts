@@ -26,8 +26,7 @@ declare global {
   var prismaGlobal: PrismaClient | undefined;
 }
 
-const prisma: PrismaClient =
-  globalThis.prismaGlobal ?? prismaClientSingleton();
+const prisma: PrismaClient = globalThis.prismaGlobal ?? prismaClientSingleton();
 
 // ログイベントハンドラーの設定
 prisma.$on('query', (e) => {

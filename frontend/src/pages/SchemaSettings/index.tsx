@@ -20,14 +20,19 @@ const DEFAULT_SCHEMA_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
 function SchemaSettings() {
   const { token } = useAuth();
   const tokenValue = token || '';
-  const { schema, loading, error, refetch } = useSchema(DEFAULT_SCHEMA_ID, tokenValue);
+  const { schema, loading, error, refetch } = useSchema(
+    DEFAULT_SCHEMA_ID,
+    tokenValue,
+  );
   const [openCategoryForm, setOpenCategoryForm] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | undefined>(undefined);
+  const [editingCategory, setEditingCategory] = useState<Category | undefined>(
+    undefined,
+  );
 
   const handleResetSchema = async () => {
     if (
       window.confirm(
-        'スキーマをデフォルト設定にリセットしますか？\n現在のカスタマイズは失われます。'
+        'スキーマをデフォルト設定にリセットしますか？\n現在のカスタマイズは失われます。',
       )
     ) {
       try {
@@ -82,7 +87,12 @@ function SchemaSettings() {
               エラーが発生しました。もう一度お試しください。
             </Typography>
             {tokenValue && (
-              <Button onClick={() => { void refetch(); }} sx={{ mt: 2 }}>
+              <Button
+                onClick={() => {
+                  void refetch();
+                }}
+                sx={{ mt: 2 }}
+              >
                 再試行
               </Button>
             )}
@@ -117,7 +127,9 @@ function SchemaSettings() {
           <Button
             variant="outlined"
             startIcon={<Refresh />}
-            onClick={() => { void handleResetSchema(); }}
+            onClick={() => {
+              void handleResetSchema();
+            }}
             color="warning"
           >
             デフォルト復元
@@ -145,7 +157,9 @@ function SchemaSettings() {
 
             <CategoryList
               schema={schema}
-              onUpdate={() => { void refetch(); }}
+              onUpdate={() => {
+                void refetch();
+              }}
               token={tokenValue}
               onEdit={handleEditCategory}
             />

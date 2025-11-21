@@ -56,7 +56,11 @@ describe('CategoryList', () => {
 
   it('should render categories', () => {
     render(
-      <CategoryList schema={mockSchema} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={mockSchema}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     expect(screen.getByText('Category 1')).toBeInTheDocument();
@@ -72,17 +76,27 @@ describe('CategoryList', () => {
     };
 
     render(
-      <CategoryList schema={emptySchema} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={emptySchema}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     expect(
-      screen.getByText(/カテゴリがありません。「カテゴリを追加」ボタンから作成してください。/)
+      screen.getByText(
+        /カテゴリがありません。「カテゴリを追加」ボタンから作成してください。/,
+      ),
     ).toBeInTheDocument();
   });
 
   it('should display category metadata', () => {
     render(
-      <CategoryList schema={mockSchema} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={mockSchema}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     // displayOrderが表示されることを確認
@@ -99,7 +113,11 @@ describe('CategoryList', () => {
     window.confirm = vi.fn(() => true);
 
     render(
-      <CategoryList schema={mockSchema} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={mockSchema}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
@@ -107,7 +125,7 @@ describe('CategoryList', () => {
 
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalledWith(
-        'このカテゴリを削除しますか？\n関連するフィールドもすべて削除されます。'
+        'このカテゴリを削除しますか？\n関連するフィールドもすべて削除されます。',
       );
       expect(schemaApi.deleteCategory).toHaveBeenCalledWith('cat-1', mockToken);
       expect(mockOnUpdate).toHaveBeenCalled();
@@ -119,7 +137,11 @@ describe('CategoryList', () => {
     window.confirm = vi.fn(() => false);
 
     render(
-      <CategoryList schema={mockSchema} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={mockSchema}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
@@ -133,12 +155,18 @@ describe('CategoryList', () => {
   });
 
   it('should handle delete error', async () => {
-    vi.mocked(schemaApi.deleteCategory).mockRejectedValue(new Error('Delete failed'));
+    vi.mocked(schemaApi.deleteCategory).mockRejectedValue(
+      new Error('Delete failed'),
+    );
     window.confirm = vi.fn(() => true);
     window.alert = vi.fn();
 
     render(
-      <CategoryList schema={mockSchema} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={mockSchema}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
@@ -173,7 +201,11 @@ describe('CategoryList', () => {
     };
 
     render(
-      <CategoryList schema={schemaWithFields} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={schemaWithFields}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     // 初期状態ではFieldListは表示されていない
@@ -197,7 +229,11 @@ describe('CategoryList', () => {
 
   it('should show edit button', () => {
     render(
-      <CategoryList schema={mockSchema} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={mockSchema}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     const editButtons = screen.getAllByLabelText('edit');
@@ -208,7 +244,11 @@ describe('CategoryList', () => {
   // 実際の実装では、DndContext のテストユーティリティを使用する必要があります
   it('should have drag handles', () => {
     render(
-      <CategoryList schema={mockSchema} onUpdate={mockOnUpdate} token={mockToken} />
+      <CategoryList
+        schema={mockSchema}
+        onUpdate={mockOnUpdate}
+        token={mockToken}
+      />,
     );
 
     // DragHandleアイコンが存在することを確認

@@ -24,7 +24,7 @@ import {
  */
 export async function getSchemaHandler(
   req: Request<{ schemaId: string }>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { schemaId } = req.params;
@@ -80,7 +80,7 @@ export async function getSchemaHandler(
  */
 export async function createCategoryHandler(
   req: Request<object, object, CreateCategoryRequestBody>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { schemaId, name, description, displayOrder } = req.body;
@@ -152,7 +152,7 @@ export async function createCategoryHandler(
  */
 export async function updateCategoryHandler(
   req: Request<{ id: string }, object, UpdateCategoryRequestBody>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { id } = req.params;
@@ -170,7 +170,10 @@ export async function updateCategoryHandler(
     }
 
     // displayOrder のバリデーション
-    if (displayOrder !== undefined && (typeof displayOrder !== 'number' || displayOrder < 1)) {
+    if (
+      displayOrder !== undefined &&
+      (typeof displayOrder !== 'number' || displayOrder < 1)
+    ) {
       res.status(400).json({
         success: false,
         error: {
@@ -181,7 +184,11 @@ export async function updateCategoryHandler(
       return;
     }
 
-    const category = await updateCategory(id, { name, description, displayOrder });
+    const category = await updateCategory(id, {
+      name,
+      description,
+      displayOrder,
+    });
 
     res.status(200).json({
       success: true,
@@ -220,7 +227,7 @@ export async function updateCategoryHandler(
  */
 export async function deleteCategoryHandler(
   req: Request<{ id: string }>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { id } = req.params;
@@ -275,7 +282,7 @@ export async function deleteCategoryHandler(
  */
 export async function createFieldHandler(
   req: Request<object, object, CreateFieldRequestBody>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const {
@@ -295,14 +302,22 @@ export async function createFieldHandler(
         success: false,
         error: {
           code: 'VALIDATION_ERROR',
-          message: 'Required fields are missing (categoryId, fieldName, dataType, displayOrder)',
+          message:
+            'Required fields are missing (categoryId, fieldName, dataType, displayOrder)',
         },
       });
       return;
     }
 
     // dataType の検証
-    const validDataTypes = ['TEXT', 'TEXTAREA', 'DATE', 'RADIO', 'CHECKBOX', 'LIST'];
+    const validDataTypes = [
+      'TEXT',
+      'TEXTAREA',
+      'DATE',
+      'RADIO',
+      'CHECKBOX',
+      'LIST',
+    ];
     if (!validDataTypes.includes(dataType)) {
       res.status(400).json({
         success: false,
@@ -376,7 +391,7 @@ export async function createFieldHandler(
  */
 export async function updateFieldHandler(
   req: Request<{ id: string }, object, UpdateFieldRequestBody>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { id } = req.params;
@@ -403,7 +418,14 @@ export async function updateFieldHandler(
 
     // dataType の検証
     if (dataType) {
-      const validDataTypes = ['TEXT', 'TEXTAREA', 'DATE', 'RADIO', 'CHECKBOX', 'LIST'];
+      const validDataTypes = [
+        'TEXT',
+        'TEXTAREA',
+        'DATE',
+        'RADIO',
+        'CHECKBOX',
+        'LIST',
+      ];
       if (!validDataTypes.includes(dataType)) {
         res.status(400).json({
           success: false,
@@ -474,7 +496,7 @@ export async function updateFieldHandler(
  */
 export async function deleteFieldHandler(
   req: Request<{ id: string }>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { id } = req.params;
@@ -529,7 +551,7 @@ export async function deleteFieldHandler(
  */
 export async function resetSchemaHandler(
   req: Request<object, object, ResetSchemaRequestBody>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { schemaId } = req.body;

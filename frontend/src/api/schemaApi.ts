@@ -41,9 +41,12 @@ export const schemaApi = {
    * スキーマを取得
    */
   getSchema: async (schemaId: string, token: string): Promise<Schema> => {
-    const response = await axios.get<ApiResponse<Schema>>(`${API_URL}/api/schema/${schemaId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.get<ApiResponse<Schema>>(
+      `${API_URL}/api/schema/${schemaId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return response.data.data;
   },
 
@@ -57,11 +60,15 @@ export const schemaApi = {
       description?: string;
       displayOrder: number;
     },
-    token: string
+    token: string,
   ): Promise<Category> => {
-    const response = await axios.post<ApiResponse<Category>>(`${API_URL}/api/schema/categories`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.post<ApiResponse<Category>>(
+      `${API_URL}/api/schema/categories`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return response.data.data;
   },
 
@@ -75,14 +82,14 @@ export const schemaApi = {
       description?: string;
       displayOrder?: number;
     },
-    token: string
+    token: string,
   ): Promise<Category> => {
     const response = await axios.put<ApiResponse<Category>>(
       `${API_URL}/api/schema/categories/${id}`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
-      }
+      },
     );
     return response.data.data;
   },
@@ -110,11 +117,15 @@ export const schemaApi = {
       placeholderText?: string;
       displayOrder: number;
     },
-    token: string
+    token: string,
   ): Promise<Field> => {
-    const response = await axios.post<ApiResponse<Field>>(`${API_URL}/api/schema/fields`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.post<ApiResponse<Field>>(
+      `${API_URL}/api/schema/fields`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return response.data.data;
   },
 
@@ -132,11 +143,15 @@ export const schemaApi = {
       placeholderText?: string;
       displayOrder?: number;
     },
-    token: string
+    token: string,
   ): Promise<Field> => {
-    const response = await axios.put<ApiResponse<Field>>(`${API_URL}/api/schema/fields/${id}`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.put<ApiResponse<Field>>(
+      `${API_URL}/api/schema/fields/${id}`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return response.data.data;
   },
 
@@ -158,7 +173,7 @@ export const schemaApi = {
       { schemaId },
       {
         headers: { Authorization: `Bearer ${token}` },
-      }
+      },
     );
     return response.data.data;
   },

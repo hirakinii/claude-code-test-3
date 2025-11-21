@@ -13,7 +13,7 @@ export interface AuthRequest extends Request {
 export function requireAuth(
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
   try {
     // Authorization ヘッダーからトークンを取得

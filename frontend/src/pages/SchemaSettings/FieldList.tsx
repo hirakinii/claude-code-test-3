@@ -151,7 +151,9 @@ function FieldList({ category, token, onUpdate }: FieldListProps) {
             <IconButton
               edge="end"
               aria-label="delete"
-              onClick={() => { void handleDeleteField(field.id); }}
+              onClick={() => {
+                void handleDeleteField(field.id);
+              }}
             >
               <Delete fontSize="small" />
             </IconButton>

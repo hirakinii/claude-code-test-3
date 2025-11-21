@@ -41,20 +41,24 @@ describe('Login Page', () => {
     render(
       <BrowserRouter>
         <Login />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
-    expect(screen.getByRole('heading', { name: 'ログイン' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'ログイン' }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText('メールアドレス')).toBeInTheDocument();
     expect(screen.getByLabelText('パスワード')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /ログイン/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /ログイン/i }),
+    ).toBeInTheDocument();
   });
 
   it('should show validation error for empty email', async () => {
     render(
       <BrowserRouter>
         <Login />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const submitButton = screen.getByRole('button', { name: /ログイン/i });
@@ -69,7 +73,7 @@ describe('Login Page', () => {
     render(
       <BrowserRouter>
         <Login />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const emailInput = screen.getByLabelText('メールアドレス');
@@ -79,7 +83,9 @@ describe('Login Page', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('有効なメールアドレスを入力してください')).toBeInTheDocument();
+      expect(
+        screen.getByText('有効なメールアドレスを入力してください'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -87,7 +93,7 @@ describe('Login Page', () => {
     render(
       <BrowserRouter>
         <Login />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const emailInput = screen.getByLabelText('メールアドレス');
@@ -100,7 +106,9 @@ describe('Login Page', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('パスワードは8文字以上である必要があります')).toBeInTheDocument();
+      expect(
+        screen.getByText('パスワードは8文字以上である必要があります'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -110,7 +118,7 @@ describe('Login Page', () => {
     render(
       <BrowserRouter>
         <Login />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const emailInput = screen.getByLabelText('メールアドレス');
@@ -134,7 +142,7 @@ describe('Login Page', () => {
     render(
       <BrowserRouter>
         <Login />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     const emailInput = screen.getByLabelText('メールアドレス');
@@ -147,7 +155,11 @@ describe('Login Page', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('ログインに失敗しました。メールアドレスとパスワードを確認してください。')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'ログインに失敗しました。メールアドレスとパスワードを確認してください。',
+        ),
+      ).toBeInTheDocument();
     });
   });
 
@@ -155,7 +167,7 @@ describe('Login Page', () => {
     render(
       <BrowserRouter>
         <Login />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText(/管理者: admin@example.com/)).toBeInTheDocument();

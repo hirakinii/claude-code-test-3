@@ -48,7 +48,9 @@ describe('useSchema', () => {
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
-      expect(result.current.error).toBe('認証が必要です。ログインしてください。');
+      expect(result.current.error).toBe(
+        '認証が必要です。ログインしてください。',
+      );
       expect(result.current.schema).toBeNull();
     });
 
@@ -56,7 +58,9 @@ describe('useSchema', () => {
   });
 
   it('should handle fetch error', async () => {
-    vi.mocked(schemaApi.getSchema).mockRejectedValue(new Error('Network error'));
+    vi.mocked(schemaApi.getSchema).mockRejectedValue(
+      new Error('Network error'),
+    );
 
     const { result } = renderHook(() => useSchema(mockSchemaId, mockToken));
 
@@ -105,7 +109,7 @@ describe('useSchema', () => {
       ({ schemaId, token }) => useSchema(schemaId, token),
       {
         initialProps: { schemaId: mockSchemaId, token: mockToken },
-      }
+      },
     );
 
     await waitFor(() => {

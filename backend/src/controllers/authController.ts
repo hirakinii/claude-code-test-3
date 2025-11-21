@@ -9,7 +9,7 @@ import { LoginRequestBody } from '../types/requests';
  */
 export async function loginHandler(
   req: Request<object, object, LoginRequestBody>,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { email, password } = req.body;

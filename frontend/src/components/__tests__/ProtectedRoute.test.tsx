@@ -20,7 +20,12 @@ describe('ProtectedRoute', () => {
 
   it('should render children when user is authenticated', () => {
     vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-      user: { id: '1', email: 'test@example.com', fullName: 'Test User', roles: ['CREATOR'] },
+      user: {
+        id: '1',
+        email: 'test@example.com',
+        fullName: 'Test User',
+        roles: ['CREATOR'],
+      },
       token: 'test-token',
       login: vi.fn(),
       logout: vi.fn(),
@@ -41,7 +46,7 @@ describe('ProtectedRoute', () => {
           />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
@@ -70,7 +75,7 @@ describe('ProtectedRoute', () => {
           />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText('Login Page')).toBeInTheDocument();
@@ -79,7 +84,12 @@ describe('ProtectedRoute', () => {
 
   it('should redirect to unauthorized page when user is not admin but admin is required', () => {
     vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-      user: { id: '1', email: 'creator@example.com', fullName: 'Creator User', roles: ['CREATOR'] },
+      user: {
+        id: '1',
+        email: 'creator@example.com',
+        fullName: 'Creator User',
+        roles: ['CREATOR'],
+      },
       token: 'test-token',
       login: vi.fn(),
       logout: vi.fn(),
@@ -101,7 +111,7 @@ describe('ProtectedRoute', () => {
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     // /unauthorized にリダイレクトされる
@@ -111,7 +121,12 @@ describe('ProtectedRoute', () => {
 
   it('should render children when user is admin and admin is required', () => {
     vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-      user: { id: '1', email: 'admin@example.com', fullName: 'Admin User', roles: ['ADMINISTRATOR', 'CREATOR'] },
+      user: {
+        id: '1',
+        email: 'admin@example.com',
+        fullName: 'Admin User',
+        roles: ['ADMINISTRATOR', 'CREATOR'],
+      },
       token: 'test-token',
       login: vi.fn(),
       logout: vi.fn(),
@@ -133,7 +148,7 @@ describe('ProtectedRoute', () => {
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
