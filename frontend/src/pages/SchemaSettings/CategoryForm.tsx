@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -49,6 +50,23 @@ function CategoryForm({
       displayOrder: category?.displayOrder || 1,
     },
   });
+
+  // category が変わったときにフォームの値を更新
+  useEffect(() => {
+    if (category) {
+      reset({
+        name: category.name,
+        description: category.description || '',
+        displayOrder: category.displayOrder,
+      });
+    } else {
+      reset({
+        name: '',
+        description: '',
+        displayOrder: 1,
+      });
+    }
+  }, [category, reset]);
 
   const onSubmit = async (data: FormData) => {
     try {

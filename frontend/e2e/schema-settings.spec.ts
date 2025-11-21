@@ -59,7 +59,7 @@ test.describe('Schema Settings', () => {
     await saveButton.click();
 
     // カテゴリが追加されたことを確認（少し待つ）
-    await expect(page.locator('text=テストカテゴリ E2E')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=テストカテゴリ E2E').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('should edit a category', async ({ page }) => {
@@ -102,10 +102,10 @@ test.describe('Schema Settings', () => {
     const saveButton = page.locator('button').filter({ hasText: /保存|Save/i }).first();
     await saveButton.click();
 
-    await expect(page.locator('text=削除テストカテゴリ')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=削除テストカテゴリ').first()).toBeVisible({ timeout: 5000 });
 
     // 作成したカテゴリを展開
-    await page.locator('text=削除テストカテゴリ').click();
+    await page.locator('text=削除テストカテゴリ').first().click();
     await page.waitForTimeout(500);
 
     // 削除ダイアログのハンドラを設定
@@ -118,12 +118,12 @@ test.describe('Schema Settings', () => {
     const deleteButtons = page.locator('button[aria-label*="delete"], button[title*="削除"]');
 
     // 削除テストカテゴリに対応する削除ボタンを探す
-    const categoryRow = page.locator('text=削除テストカテゴリ').locator('..');
+    const categoryRow = page.locator('text=削除テストカテゴリ').first().locator('..');
     const deleteButton = categoryRow.locator('button[aria-label*="delete"], button[title*="削除"]').first();
     await deleteButton.click();
 
     // カテゴリが削除されたことを確認
-    await expect(page.locator('text=削除テストカテゴリ')).not.toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=削除テストカテゴリ').first()).not.toBeVisible({ timeout: 5000 });
   });
 
   test('should create a new field in a category', async ({ page }) => {

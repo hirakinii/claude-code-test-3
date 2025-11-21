@@ -41,6 +41,7 @@ interface CategoryListProps {
   schema: Schema;
   onUpdate: () => void;
   token: string;
+  onEdit?: (category: Category) => void;
 }
 
 interface SortableItemProps {
@@ -142,7 +143,7 @@ function SortableItem({
   );
 }
 
-function CategoryList({ schema, onUpdate, token }: CategoryListProps) {
+function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: CategoryListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -197,8 +198,9 @@ function CategoryList({ schema, onUpdate, token }: CategoryListProps) {
   };
 
   const handleEdit = (category: Category) => {
-    // TODO: 編集モーダルを開く
-    console.log('Edit category:', category);
+    if (onEditCategory) {
+      onEditCategory(category);
+    }
   };
 
   if (!schema.categories || schema.categories.length === 0) {
