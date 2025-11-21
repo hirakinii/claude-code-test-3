@@ -124,6 +124,121 @@ jobs:
           name: frontend-coverage
         continue-on-error: true
 
+  # E2E Tests
+  e2e-test:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # Backend setup
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Generate Prisma Client
+        working-directory: ./backend
+        run: npm run prisma:generate
+
+      - name: Run database migrations
+        working-directory: ./backend
+        run: npm run prisma:migrate:prod
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+
+      - name: Seed database
+        working-directory: ./backend
+        run: npm run prisma:seed
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+
+      # Frontend setup
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps chromium
+
+      # Start backend in background
+      - name: Start backend server
+        working-directory: ./backend
+        run: |
+          npm run dev &
+          echo $! > backend.pid
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+          JWT_SECRET: test-secret-key-for-ci
+          NODE_ENV: development
+          PORT: 3001
+
+      # Wait for backend to be ready
+      - name: Wait for backend
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3001/health; do sleep 2; done'
+
+      # Start frontend in background
+      - name: Start frontend server
+        working-directory: ./frontend
+        run: |
+          npm run dev &
+          echo $! > frontend.pid
+        env:
+          VITE_API_URL: http://localhost:3001
+
+      # Wait for frontend to be ready
+      - name: Wait for frontend
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:5173; do sleep 2; done'
+
+      # Run E2E tests
+      - name: Run Playwright tests
+        working-directory: ./frontend
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      # Upload Playwright report
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 30
+
+      # Cleanup
+      - name: Stop servers
+        if: always()
+        run: |
+          if [ -f backend/backend.pid ]; then kill $(cat backend/backend.pid) || true; fi
+          if [ -f frontend/frontend.pid ]; then kill $(cat frontend/frontend.pid) || true; fi
+
   # Security Audit
   security-audit:
     name: Security Audit
