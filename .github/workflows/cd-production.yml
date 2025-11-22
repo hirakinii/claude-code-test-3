@@ -31,9 +31,7 @@ jobs:
     name: Deploy to Production Environment
     runs-on: ubuntu-latest
     needs: validate-input
-    environment:
-      name: production
-      url: https://${{ env.SERVICE_NAME_FRONTEND }}-${{ secrets.GCP_PROJECT_NUMBER_PROD }}.a.run.app
+    environment: production
 
     steps:
       - name: Checkout code
