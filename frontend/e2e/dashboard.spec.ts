@@ -13,6 +13,9 @@ test.describe('Dashboard Page', () => {
 
     // ダッシュボードへの遷移を待つ
     await page.waitForURL(/\/dashboard/, { timeout: 10000 });
+
+    // ダッシュボードのコンテンツが表示されるまで待つ
+    await page.waitForSelector('text=仕様書一覧', { timeout: 10000 });
   });
 
   test('should display dashboard with correct title', async ({ page }) => {
@@ -116,6 +119,9 @@ test.describe('Dashboard Page - Admin', () => {
 
     // ダッシュボードへの遷移を待つ
     await page.waitForURL(/\/dashboard/, { timeout: 10000 });
+
+    // ダッシュボードのコンテンツが表示されるまで待つ
+    await page.waitForSelector('text=仕様書一覧', { timeout: 10000 });
   });
 
   test('should show settings button for admin', async ({ page }) => {
