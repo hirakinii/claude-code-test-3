@@ -2341,6 +2341,323 @@ npm run dev:frontend  # 正常動作
 
 ---
 
+### v1.0.3 (2025-11-22) - FieldForm 編集時の初期値バグ修正
+
+#### 問題概要
+
+**バグ内容**:
+既存のフィールドの「編集」ボタンをクリックすると「フィールド編集」フォームがモーダルとして表示されるが、フォーム内の全てのプロパティ値が初期値（空白またはデフォルト値）となっている。
+
+**期待される動作**:
+既存のフィールドの「編集」ボタンをクリックすると、そのフィールドのプロパティ値が入力された状態で「フィールド編集」フォームが表示される。
+
+**影響範囲**:
+- `frontend/src/pages/SchemaSettings/FieldForm.tsx`
+- `frontend/src/pages/SchemaSettings/__tests__/FieldForm.test.tsx`
+
+#### 原因分析
+
+**根本原因**:
+`FieldForm.tsx` において、`react-hook-form` の `useForm` フックの `defaultValues` はコンポーネントの**初回マウント時**にのみ評価される。
+
+`FieldList.tsx` でのフローは以下の通り：
+1. `FieldForm` コンポーネントは `open={false}` の状態で最初からレンダリング済み（マウント済み）
+2. 編集ボタンをクリックすると `handleEditField(field)` が呼ばれる
+3. `setEditingField(field)` で `editingField` ステートが更新される
+4. `setOpenFieldForm(true)` でダイアログが開く
+5. しかし、`FieldForm` はすでにマウント済みのため、`defaultValues` は初回マウント時の値（`field` が `null` だった時の値）のまま
+
+**コード上の問題箇所** (`FieldForm.tsx:46-64`):
+```typescript
+function FieldForm({
+  open,
+  onClose,
+  onSuccess,
+  categoryId,
+  token,
+  field,
+}: FieldFormProps) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm<FormData>({
+    defaultValues: {
+      fieldName: field?.fieldName || '',
+      dataType: field?.dataType || 'TEXT',
+      isRequired: field?.isRequired || false,
+      placeholderText: field?.placeholderText || '',
+      displayOrder: field?.displayOrder || 1,
+      options: field?.options ? JSON.stringify(field.options) : '',
+      listTargetEntity: field?.listTargetEntity || '',
+    },
+  });
+  // ... defaultValues は初回マウント時にのみ評価される
+```
+
+#### 修正計画
+
+**修正方法**:
+`useEffect` を使用して、`open` と `field` の変更を監視し、ダイアログが開いた時に `reset()` 関数を呼び出してフォームの値を更新する。
+
+**修正内容** (`FieldForm.tsx`):
+1. `useEffect` を import に追加
+2. `useForm` の後に `useEffect` を追加して、`open` または `field` が変更された時にフォームをリセット
+
+```typescript
+import { useEffect } from 'react';
+
+// useForm の後に追加
+useEffect(() => {
+  if (open) {
+    reset({
+      fieldName: field?.fieldName || '',
+      dataType: field?.dataType || 'TEXT',
+      isRequired: field?.isRequired || false,
+      placeholderText: field?.placeholderText || '',
+      displayOrder: field?.displayOrder || 1,
+      options: field?.options ? JSON.stringify(field.options) : '',
+      listTargetEntity: field?.listTargetEntity || '',
+    });
+  }
+}, [open, field, reset]);
+```
+
+#### テスト仕様
+
+**新規テストケース（TDD）**:
+
+以下のテストケースを `FieldForm.test.tsx` に追加する：
+
+```typescript
+describe('FieldForm - editing field data population', () => {
+  it('should populate form with existing field data when opened for editing', async () => {
+    const field: Field = {
+      id: 'field-1',
+      categoryId: mockCategoryId,
+      fieldName: 'Existing Field',
+      dataType: 'TEXT',
+      isRequired: true,
+      placeholderText: 'Placeholder text',
+      displayOrder: 5,
+    };
+
+    // まず open=false でレンダリング
+    const { rerender } = render(
+      <FieldForm
+        open={false}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={null}
+      />,
+    );
+
+    // フィールドを設定して open=true に変更
+    rerender(
+      <FieldForm
+        open={true}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={field}
+      />,
+    );
+
+    // フォームに既存のフィールド値が表示されることを確認
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Existing Field')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Placeholder text')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('5')).toBeInTheDocument();
+      expect(screen.getByLabelText('必須項目')).toBeChecked();
+    });
+  });
+
+  it('should reset form to empty values when opened for creating new field', async () => {
+    const field: Field = {
+      id: 'field-1',
+      categoryId: mockCategoryId,
+      fieldName: 'Existing Field',
+      dataType: 'TEXT',
+      isRequired: true,
+      placeholderText: 'Placeholder text',
+      displayOrder: 5,
+    };
+
+    // 最初にフィールド編集モードでレンダリング
+    const { rerender } = render(
+      <FieldForm
+        open={true}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={field}
+      />,
+    );
+
+    // ダイアログを閉じる
+    rerender(
+      <FieldForm
+        open={false}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={field}
+      />,
+    );
+
+    // 新規作成モードで開く（field=null）
+    rerender(
+      <FieldForm
+        open={true}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={null}
+      />,
+    );
+
+    // フォームが初期値にリセットされていることを確認
+    await waitFor(() => {
+      expect(screen.getByLabelText('フィールド名')).toHaveValue('');
+      expect(screen.getByLabelText('プレースホルダー')).toHaveValue('');
+      expect(screen.getByDisplayValue('1')).toBeInTheDocument(); // displayOrder のデフォルト値
+      expect(screen.getByLabelText('必須項目')).not.toBeChecked();
+    });
+  });
+
+  it('should populate RADIO field with options when opened for editing', async () => {
+    const field: Field = {
+      id: 'field-1',
+      categoryId: mockCategoryId,
+      fieldName: 'Radio Field',
+      dataType: 'RADIO',
+      isRequired: false,
+      placeholderText: '',
+      displayOrder: 1,
+      options: ['Option 1', 'Option 2'],
+    };
+
+    const { rerender } = render(
+      <FieldForm
+        open={false}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={null}
+      />,
+    );
+
+    rerender(
+      <FieldForm
+        open={true}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={field}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Radio Field')).toBeInTheDocument();
+      // オプションがJSON形式で表示されていることを確認
+      expect(
+        screen.getByDisplayValue('["Option 1","Option 2"]'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('should populate LIST field with listTargetEntity when opened for editing', async () => {
+    const field: Field = {
+      id: 'field-1',
+      categoryId: mockCategoryId,
+      fieldName: 'List Field',
+      dataType: 'LIST',
+      isRequired: true,
+      placeholderText: '',
+      displayOrder: 3,
+      listTargetEntity: 'Deliverable',
+    };
+
+    const { rerender } = render(
+      <FieldForm
+        open={false}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={null}
+      />,
+    );
+
+    rerender(
+      <FieldForm
+        open={true}
+        onClose={mockOnClose}
+        onSuccess={mockOnSuccess}
+        categoryId={mockCategoryId}
+        token={mockToken}
+        field={field}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('List Field')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Deliverable')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+**既存テストへの影響**:
+既存のテスト `it('should render form for editing existing field', ...)` は引き続きパスする。このテストは初回マウント時に `field` prop を渡しているため、`defaultValues` が正しく評価される。新規テストは `rerender` を使用して prop の変更後の動作を検証する。
+
+#### 実装手順
+
+1. **テスト作成（RED）**:
+   - `FieldForm.test.tsx` に新しいテストケースを追加
+   - テストを実行して失敗することを確認
+
+2. **最小実装（GREEN）**:
+   - `FieldForm.tsx` に `useEffect` を追加
+   - テストを実行してパスすることを確認
+
+3. **リファクタリング（REFACTOR）**:
+   - コードの整理（必要に応じて）
+   - 既存のテストがすべてパスすることを確認
+
+4. **E2E テストの確認**:
+   - `schema-settings.spec.ts` のフィールド編集テストがパスすることを確認
+
+#### チェックリスト
+
+- [ ] 新規テストケースを `FieldForm.test.tsx` に追加
+- [ ] テストが失敗することを確認（RED）
+- [ ] `FieldForm.tsx` に `useEffect` を実装
+- [ ] 新規テストがパスすることを確認（GREEN）
+- [ ] 既存のテスト 14 件がすべてパスすることを確認
+- [ ] E2E テスト `schema-settings.spec.ts` がパスすることを確認
+- [ ] コードレビュー完了
+
+#### 修正後のファイル一覧
+
+| ファイル | 変更内容 |
+|---------|---------|
+| `frontend/src/pages/SchemaSettings/FieldForm.tsx` | `useEffect` を追加してフォームリセットロジックを実装 |
+| `frontend/src/pages/SchemaSettings/__tests__/FieldForm.test.tsx` | 新規テストケース 4 件を追加 |
+
+---
+
 **作成者**: Claude
 **最終更新**: 2025-11-22
-**バージョン**: 1.0.2
+**バージョン**: 1.0.3
