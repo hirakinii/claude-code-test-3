@@ -55,3 +55,18 @@ export interface UpdateFieldRequestBody {
 export interface ResetSchemaRequestBody {
   schemaId: string;
 }
+
+// ============================================
+// Specification Request Bodies
+// ============================================
+
+export interface CreateSpecificationRequestBody {
+  schemaId?: string;
+}
+
+export interface GetSpecificationsQueryParams {
+  page?: string;
+  limit?: string;
+  status?: 'DRAFT' | 'REVIEW' | 'SAVED';
+  sort?: string;
+}

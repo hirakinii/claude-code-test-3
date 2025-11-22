@@ -4,6 +4,7 @@ import cors from 'cors';
 import { healthRouter } from './routes/health';
 import authRouter from './routes/auth';
 import schemaRouter from './routes/schema';
+import specificationRouter from './routes/specification';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter, authLimiter } from './middleware/rateLimiter';
 import { config } from './config/env';
@@ -43,6 +44,7 @@ export function createServer(): Application {
   app.use('/health', healthRouter);
   app.use('/api/auth', authLimiter, authRouter);
   app.use('/api/schema', schemaRouter);
+  app.use('/api/specifications', specificationRouter);
 
   // 404 handler
   app.use(notFoundHandler);

@@ -45,6 +45,17 @@ export function requireAuth(
 
     const token = parts[1];
 
+    if (!token) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Token is missing',
+        },
+      });
+      return;
+    }
+
     // トークンを検証
     const decoded = verifyToken(token);
 
