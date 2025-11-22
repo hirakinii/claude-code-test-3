@@ -458,4 +458,196 @@ describe('FieldForm', () => {
 
     expect(mockOnClose).toHaveBeenCalled();
   });
+
+  /**
+   * Bug fix tests: FieldForm editing field data population
+   * These tests verify that when the form is re-opened for editing,
+   * the existing field data is properly populated in the form.
+   */
+  describe('editing field data population (bug fix)', () => {
+    it('should populate form with existing field data when opened for editing after initial mount', async () => {
+      const field: Field = {
+        id: 'field-1',
+        categoryId: mockCategoryId,
+        fieldName: 'Existing Field',
+        dataType: 'TEXT',
+        isRequired: true,
+        placeholderText: 'Placeholder text',
+        displayOrder: 5,
+      };
+
+      // First render with open=false and no field
+      const { rerender } = render(
+        <FieldForm
+          open={false}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={null}
+        />,
+      );
+
+      // Rerender with field data and open=true (simulating edit button click)
+      rerender(
+        <FieldForm
+          open={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={field}
+        />,
+      );
+
+      // Verify form is populated with existing field values
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Existing Field')).toBeInTheDocument();
+        expect(
+          screen.getByDisplayValue('Placeholder text'),
+        ).toBeInTheDocument();
+        expect(screen.getByDisplayValue('5')).toBeInTheDocument();
+        expect(screen.getByLabelText('必須項目')).toBeChecked();
+      });
+    });
+
+    it('should reset form to empty values when opened for creating new field after editing', async () => {
+      const field: Field = {
+        id: 'field-1',
+        categoryId: mockCategoryId,
+        fieldName: 'Existing Field',
+        dataType: 'TEXT',
+        isRequired: true,
+        placeholderText: 'Placeholder text',
+        displayOrder: 5,
+      };
+
+      // First render in edit mode
+      const { rerender } = render(
+        <FieldForm
+          open={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={field}
+        />,
+      );
+
+      // Close the dialog
+      rerender(
+        <FieldForm
+          open={false}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={field}
+        />,
+      );
+
+      // Open in create mode (field=null)
+      rerender(
+        <FieldForm
+          open={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={null}
+        />,
+      );
+
+      // Verify form is reset to default values
+      await waitFor(() => {
+        expect(screen.getByLabelText('フィールド名')).toHaveValue('');
+        expect(screen.getByLabelText('プレースホルダー')).toHaveValue('');
+        expect(screen.getByDisplayValue('1')).toBeInTheDocument(); // displayOrder default
+        expect(screen.getByLabelText('必須項目')).not.toBeChecked();
+      });
+    });
+
+    it('should populate RADIO field with options when opened for editing', async () => {
+      const field: Field = {
+        id: 'field-1',
+        categoryId: mockCategoryId,
+        fieldName: 'Radio Field',
+        dataType: 'RADIO',
+        isRequired: false,
+        placeholderText: '',
+        displayOrder: 1,
+        options: ['Option 1', 'Option 2'],
+      };
+
+      const { rerender } = render(
+        <FieldForm
+          open={false}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={null}
+        />,
+      );
+
+      rerender(
+        <FieldForm
+          open={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={field}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('Radio Field')).toBeInTheDocument();
+        // Options should be displayed as JSON string
+        expect(
+          screen.getByDisplayValue('["Option 1","Option 2"]'),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('should populate LIST field with listTargetEntity when opened for editing', async () => {
+      const field: Field = {
+        id: 'field-1',
+        categoryId: mockCategoryId,
+        fieldName: 'List Field',
+        dataType: 'LIST',
+        isRequired: true,
+        placeholderText: '',
+        displayOrder: 3,
+        listTargetEntity: 'Deliverable',
+      };
+
+      const { rerender } = render(
+        <FieldForm
+          open={false}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={null}
+        />,
+      );
+
+      rerender(
+        <FieldForm
+          open={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+          categoryId={mockCategoryId}
+          token={mockToken}
+          field={field}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('List Field')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('Deliverable')).toBeInTheDocument();
+      });
+    });
+  });
 });
