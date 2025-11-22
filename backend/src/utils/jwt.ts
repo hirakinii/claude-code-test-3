@@ -4,7 +4,8 @@ import { logger } from './logger';
 /* istanbul ignore next -- @preserve: Environment variable fallbacks only used when env vars are missing */
 const JWT_SECRET = process.env.JWT_SECRET || '';
 /* istanbul ignore next -- @preserve: Environment variable fallbacks only used when env vars are missing */
-const JWT_EXPIRES_IN: SignOptions['expiresIn'] = (process.env.JWT_EXPIRES_IN || '7d') as SignOptions['expiresIn'];
+const JWT_EXPIRES_IN: SignOptions['expiresIn'] = (process.env.JWT_EXPIRES_IN ||
+  '7d') as SignOptions['expiresIn'];
 
 /* istanbul ignore if -- @preserve: This check runs at module load time when JWT_SECRET is always set in tests */
 if (!JWT_SECRET) {

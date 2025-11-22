@@ -18,7 +18,9 @@ interface UseSpecificationsReturn {
   deleteSpecification: (id: string) => Promise<boolean>;
 }
 
-export function useSpecifications(token: string | null): UseSpecificationsReturn {
+export function useSpecifications(
+  token: string | null,
+): UseSpecificationsReturn {
   const [data, setData] = useState<PaginatedSpecifications | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,23 +63,27 @@ export function useSpecifications(token: string | null): UseSpecificationsReturn
     setParams((prev) => ({ ...prev, status, page: 1 }));
   }, []);
 
-  const createSpecification = useCallback(async (): Promise<Specification | null> => {
-    if (!token) {
-      setError('認証が必要です');
-      return null;
-    }
+  const createSpecification =
+    useCallback(async (): Promise<Specification | null> => {
+      if (!token) {
+        setError('認証が必要です');
+        return null;
+      }
 
-    try {
-      const newSpec = await specificationApi.createSpecification(undefined, token);
-      await fetchSpecifications();
-      return newSpec;
-    } catch (err) {
-      setError('仕様書の作成に失敗しました');
-      // eslint-disable-next-line no-console
-      console.error('Failed to create specification:', err);
-      return null;
-    }
-  }, [token, fetchSpecifications]);
+      try {
+        const newSpec = await specificationApi.createSpecification(
+          undefined,
+          token,
+        );
+        await fetchSpecifications();
+        return newSpec;
+      } catch (err) {
+        setError('仕様書の作成に失敗しました');
+        // eslint-disable-next-line no-console
+        console.error('Failed to create specification:', err);
+        return null;
+      }
+    }, [token, fetchSpecifications]);
 
   const deleteSpecification = useCallback(
     async (id: string): Promise<boolean> => {
