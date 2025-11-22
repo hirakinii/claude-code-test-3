@@ -49,8 +49,6 @@ describe('FieldForm', () => {
       isRequired: true,
       placeholderText: 'Placeholder',
       displayOrder: 5,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
     };
 
     render(
@@ -108,7 +106,7 @@ describe('FieldForm', () => {
     );
 
     // データ型をRADIOに変更 (最初のcomboboxがデータ型のSelect)
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const radioOption = screen.getByRole('option', { name: 'ラジオボタン' });
     await user.click(radioOption);
@@ -135,7 +133,7 @@ describe('FieldForm', () => {
     );
 
     // データ型をCHECKBOXに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const checkboxOption = screen.getByRole('option', {
       name: 'チェックボックス',
@@ -164,7 +162,7 @@ describe('FieldForm', () => {
     );
 
     // データ型をLISTに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const listOption = screen.getByRole('option', { name: '動的リスト' });
     await user.click(listOption);
@@ -192,7 +190,7 @@ describe('FieldForm', () => {
     await user.type(screen.getByLabelText('フィールド名'), 'Test Field');
 
     // データ型をRADIOに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const radioOption = screen.getByRole('option', { name: 'ラジオボタン' });
     await user.click(radioOption);
@@ -234,7 +232,7 @@ describe('FieldForm', () => {
     await user.type(screen.getByLabelText('フィールド名'), 'Test Field');
 
     // データ型をLISTに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const listOption = screen.getByRole('option', { name: '動的リスト' });
     await user.click(listOption);
@@ -265,8 +263,6 @@ describe('FieldForm', () => {
       isRequired: false,
       placeholderText: 'Enter text',
       displayOrder: 1,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
     });
 
     render(
@@ -312,8 +308,6 @@ describe('FieldForm', () => {
       placeholderText: '',
       displayOrder: 1,
       options: ['Option 1', 'Option 2'],
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
     });
 
     render(
@@ -329,7 +323,7 @@ describe('FieldForm', () => {
     await user.type(screen.getByLabelText('フィールド名'), 'New Radio Field');
 
     // データ型をRADIOに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const radioOption = screen.getByRole('option', { name: 'ラジオボタン' });
     await user.click(radioOption);
@@ -377,8 +371,6 @@ describe('FieldForm', () => {
       isRequired: true,
       placeholderText: '',
       displayOrder: 5,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
     };
 
     vi.mocked(schemaApi.updateField).mockResolvedValue({

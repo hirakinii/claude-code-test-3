@@ -79,8 +79,12 @@ function FieldForm({
       }
 
       const payload: FieldPayload = {
-        ...data,
         categoryId,
+        fieldName: data.fieldName,
+        dataType: data.dataType,
+        isRequired: data.isRequired,
+        placeholderText: data.placeholderText,
+        displayOrder: data.displayOrder,
       };
 
       // options のパース

@@ -152,8 +152,6 @@ describe('CategoryForm', () => {
       name: 'New Category',
       description: 'New Description',
       displayOrder: 1,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
       fields: [],
     });
 
@@ -202,8 +200,6 @@ describe('CategoryForm', () => {
       name: 'Updated Category',
       description: 'Updated Description',
       displayOrder: 10,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
       fields: [],
     });
 

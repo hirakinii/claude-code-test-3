@@ -32,8 +32,6 @@ describe('FieldList', () => {
     name: 'Category 1',
     description: 'Description 1',
     displayOrder: 1,
-    createdAt: '2025-01-01T00:00:00.000Z',
-    updatedAt: '2025-01-01T00:00:00.000Z',
     fields: [],
   };
 
@@ -43,8 +41,6 @@ describe('FieldList', () => {
     name: 'Category 1',
     description: 'Description 1',
     displayOrder: 1,
-    createdAt: '2025-01-01T00:00:00.000Z',
-    updatedAt: '2025-01-01T00:00:00.000Z',
     fields: [
       {
         id: 'field-1',
@@ -54,8 +50,6 @@ describe('FieldList', () => {
         isRequired: true,
         placeholderText: 'Enter text',
         displayOrder: 1,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
       },
       {
         id: 'field-2',
@@ -65,8 +59,6 @@ describe('FieldList', () => {
         isRequired: false,
         placeholderText: '',
         displayOrder: 2,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
       },
     ],
   };
@@ -151,7 +143,7 @@ describe('FieldList', () => {
     );
 
     const editButtons = screen.getAllByLabelText('edit');
-    await user.click(editButtons[0]);
+    await user.click(editButtons[0]!);
 
     expect(screen.getByTestId('field-form-mock')).toBeInTheDocument();
   });
@@ -193,7 +185,7 @@ describe('FieldList', () => {
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalledWith(
@@ -217,7 +209,7 @@ describe('FieldList', () => {
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalled();
@@ -242,7 +234,7 @@ describe('FieldList', () => {
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith(

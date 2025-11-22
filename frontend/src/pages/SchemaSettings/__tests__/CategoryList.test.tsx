@@ -29,8 +29,6 @@ const mockSchema: Schema = {
       name: 'Category 1',
       description: 'Description 1',
       displayOrder: 1,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
       fields: [],
     },
     {
@@ -39,8 +37,6 @@ const mockSchema: Schema = {
       name: 'Category 2',
       description: 'Description 2',
       displayOrder: 2,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
       fields: [],
     },
   ],
@@ -121,7 +117,7 @@ describe('CategoryList', () => {
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalledWith(
@@ -145,7 +141,7 @@ describe('CategoryList', () => {
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalled();
@@ -170,7 +166,7 @@ describe('CategoryList', () => {
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith('カテゴリの削除に失敗しました');
@@ -183,17 +179,15 @@ describe('CategoryList', () => {
       ...mockSchema,
       categories: [
         {
-          ...mockSchema.categories[0],
+          ...mockSchema.categories[0]!,
           fields: [
             {
               id: 'field-1',
               categoryId: 'cat-1',
-              name: 'Field 1',
+              fieldName: 'Field 1',
               dataType: 'TEXT',
               isRequired: false,
               displayOrder: 1,
-              createdAt: '2025-01-01T00:00:00.000Z',
-              updatedAt: '2025-01-01T00:00:00.000Z',
             },
           ],
         },
