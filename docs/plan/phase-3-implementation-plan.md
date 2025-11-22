@@ -1449,7 +1449,7 @@ test.describe('Dashboard', () => {
 
 **作成者**: Claude
 **最終更新**: 2025-11-22
-**バージョン**: 1.2.0
+**バージョン**: 1.3.0
 
 ---
 
@@ -1467,3 +1467,9 @@ test.describe('Dashboard', () => {
 | 2025-11-22 | E2E テスト修正（ログイン後のダッシュボードコンテンツ待機追加） | 完了 |
 | 2025-11-22 | バックエンド auth ミドルウェアテスト追加（カバレッジ 80%+ 達成） | 完了 |
 | 2025-11-22 | **Phase 3 全テストパス確認** | **完了** |
+| 2025-11-22 | E2E テスト DB リセット後の失敗修正（SpecificationList で仕様書0件でもステータスフィルタ表示） | 完了 |
+| 2025-11-22 | npm スクリプト Windows 互換性修正（シングルクォート → ダブルクォート） | 完了 |
+| 2025-11-22 | Backend ESLint エラー修正（specification.ts の RequestHandler キャスト、schemaService.ts の curly ルール） | 完了 |
+| 2025-11-22 | Frontend ESLint エラー・警告修正（specificationApi.ts、Header.tsx、useSpecifications.ts、CreateSpecificationModal.tsx、SpecificationList.tsx、Dashboard/index.tsx、テストファイル） | 完了 |
+| 2025-11-22 | useAuth フックを AuthContext.tsx から hooks/useAuth.ts に分離（react-refresh 警告対応） | 完了 |
+| 2025-11-22 | **Phase 3 全テスト + ESLint パス確認** | **完了** |
