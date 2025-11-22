@@ -140,6 +140,7 @@ function FieldList({ category, token, onUpdate }: FieldListProps) {
                   />
                 </Box>
               }
+              secondaryTypographyProps={{ component: 'div' }}
             />
             <IconButton
               edge="end"
