@@ -40,8 +40,8 @@ function Login() {
 
       await login(data.email, data.password);
 
-      // ログイン成功後、スキーマ設定画面へ遷移
-      void navigate('/settings/schema');
+      // ログイン成功後、ダッシュボードへ遷移
+      void navigate('/dashboard');
     } catch (err) {
       setError(
         'ログインに失敗しました。メールアドレスとパスワードを確認してください。',

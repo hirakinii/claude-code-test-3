@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 const Login = lazy(() => import('./pages/Login'));
 const SchemaSettings = lazy(() => import('./pages/SchemaSettings'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
 
 const theme = createTheme({
   palette: {
@@ -45,6 +46,15 @@ function App() {
               <Route path="/login" element={<Login />} />
 
               <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
                 path="/settings/schema"
                 element={
                   <ProtectedRoute requireAdmin>
@@ -53,7 +63,7 @@ function App() {
                 }
               />
 
-              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
               <Route
                 path="/unauthorized"
