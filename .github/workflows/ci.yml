@@ -216,7 +216,7 @@ jobs:
       # Wait for frontend to be ready
       - name: Wait for frontend
         run: |
-          timeout 60 bash -c 'until curl -f http://localhost:5173; do sleep 2; done'
+          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
 
       # Run E2E tests
       - name: Run Playwright tests
