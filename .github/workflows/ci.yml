@@ -54,6 +54,12 @@ jobs:
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
 
+      - name: Seed database
+        working-directory: ./backend
+        run: npm run prisma:seed
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+
       - name: Lint check
         working-directory: ./backend
         run: npm run lint
