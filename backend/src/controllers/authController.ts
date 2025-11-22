@@ -1,14 +1,15 @@
 import { Request, Response } from 'express';
 import { login } from '../services/authService';
 import { logger } from '../utils/logger';
+import { LoginRequestBody } from '../types/requests';
 
 /**
  * POST /api/auth/login
  * ユーザーログイン
  */
 export async function loginHandler(
-  req: Request,
-  res: Response
+  req: Request<object, object, LoginRequestBody>,
+  res: Response,
 ): Promise<void> {
   try {
     const { email, password } = req.body;

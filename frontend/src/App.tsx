@@ -23,7 +23,12 @@ const theme = createTheme({
 
 function LoadingFallback() {
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+    >
       <CircularProgress />
     </Box>
   );

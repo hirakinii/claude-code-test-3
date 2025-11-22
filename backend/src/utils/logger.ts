@@ -15,7 +15,7 @@ if (logFormat === 'json') {
   formats.push(
     winston.format.printf(({ level, message, timestamp, ...meta }) => {
       const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : '';
-      return `${timestamp} [${level}]: ${message} ${metaStr}`;
+      return `${String(timestamp)} [${String(level)}]: ${String(message)} ${metaStr}`;
     }),
   );
 }

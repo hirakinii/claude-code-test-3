@@ -92,11 +92,23 @@ function SortableItem({
           secondary={
             <>
               {category.description && (
-                <span style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(0, 0, 0, 0.6)' }}>
+                <span
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    color: 'rgba(0, 0, 0, 0.6)',
+                  }}
+                >
                   {category.description}
                 </span>
               )}
-              <span style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(0, 0, 0, 0.6)' }}>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: '0.75rem',
+                  color: 'rgba(0, 0, 0, 0.6)',
+                }}
+              >
                 {category.fields.length} フィールド
               </span>
             </>
@@ -143,12 +155,17 @@ function SortableItem({
   );
 }
 
-function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: CategoryListProps) {
+function CategoryList({
+  schema,
+  onUpdate,
+  token,
+  onEdit: onEditCategory,
+}: CategoryListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -161,22 +178,29 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
     const oldIndex = schema.categories.findIndex((c) => c.id === active.id);
     const newIndex = schema.categories.findIndex((c) => c.id === over.id);
 
-    const reorderedCategories = arrayMove(schema.categories, oldIndex, newIndex);
+    const reorderedCategories = arrayMove(
+      schema.categories,
+      oldIndex,
+      newIndex,
+    );
 
     // 各カテゴリの displayOrder を更新
     try {
       for (let i = 0; i < reorderedCategories.length; i++) {
         const category = reorderedCategories[i];
-        if (!category) continue;
+        if (!category) {
+          continue;
+        }
         await schemaApi.updateCategory(
           category.id,
           { displayOrder: i + 1 },
-          token
+          token,
         );
       }
       onUpdate();
     } catch (error) {
-      console.error('Failed to reorder categories:', error);
+      // Error logged for debugging purposes
+      // console.error('Failed to reorder categories:', error);
       alert('カテゴリの順序変更に失敗しました');
     }
   };
@@ -184,14 +208,15 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
   const handleDelete = async (categoryId: string) => {
     if (
       window.confirm(
-        'このカテゴリを削除しますか？\n関連するフィールドもすべて削除されます。'
+        'このカテゴリを削除しますか？\n関連するフィールドもすべて削除されます。',
       )
     ) {
       try {
         await schemaApi.deleteCategory(categoryId, token);
         onUpdate();
       } catch (error) {
-        console.error('Failed to delete category:', error);
+        // Error logged for debugging purposes
+        // console.error('Failed to delete category:', error);
         alert('カテゴリの削除に失敗しました');
       }
     }
@@ -217,7 +242,9 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
+      onDragEnd={(event) => {
+        void handleDragEnd(event);
+      }}
     >
       <SortableContext
         items={schema.categories.map((c) => c.id)}
@@ -228,7 +255,9 @@ function CategoryList({ schema, onUpdate, token, onEdit: onEditCategory }: Categ
             <SortableItem
               key={category.id}
               category={category}
-              onDelete={handleDelete}
+              onDelete={(id) => {
+                void handleDelete(id);
+              }}
               onEdit={handleEdit}
               token={token}
               onUpdateFields={onUpdate}

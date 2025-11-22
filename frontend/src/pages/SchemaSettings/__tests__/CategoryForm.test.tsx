@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CategoryForm from '../CategoryForm';
 import { schemaApi } from '../../../api/schemaApi';
@@ -30,7 +30,7 @@ describe('CategoryForm', () => {
         onSuccess={mockOnSuccess}
         schemaId={mockSchemaId}
         token={mockToken}
-      />
+      />,
     );
 
     expect(screen.getByText('カテゴリ追加')).toBeInTheDocument();
@@ -55,12 +55,14 @@ describe('CategoryForm', () => {
         schemaId={mockSchemaId}
         token={mockToken}
         category={category}
-      />
+      />,
     );
 
     expect(screen.getByText('カテゴリ編集')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Existing Category')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Existing Description')).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Existing Description'),
+    ).toBeInTheDocument();
     expect(screen.getByDisplayValue('5')).toBeInTheDocument();
   });
 
@@ -74,7 +76,7 @@ describe('CategoryForm', () => {
         onSuccess={mockOnSuccess}
         schemaId={mockSchemaId}
         token={mockToken}
-      />
+      />,
     );
 
     const submitButton = screen.getByRole('button', { name: '保存' });
@@ -98,7 +100,7 @@ describe('CategoryForm', () => {
         onSuccess={mockOnSuccess}
         schemaId={mockSchemaId}
         token={mockToken}
-      />
+      />,
     );
 
     const nameInput = screen.getByLabelText('カテゴリ名');
@@ -109,7 +111,9 @@ describe('CategoryForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('カテゴリ名は200文字以内で入力してください')).toBeInTheDocument();
+      expect(
+        screen.getByText('カテゴリ名は200文字以内で入力してください'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -123,7 +127,7 @@ describe('CategoryForm', () => {
         onSuccess={mockOnSuccess}
         schemaId={mockSchemaId}
         token={mockToken}
-      />
+      />,
     );
 
     const displayOrderInput = screen.getByLabelText('表示順序');
@@ -134,7 +138,9 @@ describe('CategoryForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('表示順序は1以上の値を入力してください')).toBeInTheDocument();
+      expect(
+        screen.getByText('表示順序は1以上の値を入力してください'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -146,8 +152,6 @@ describe('CategoryForm', () => {
       name: 'New Category',
       description: 'New Description',
       displayOrder: 1,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
       fields: [],
     });
 
@@ -158,7 +162,7 @@ describe('CategoryForm', () => {
         onSuccess={mockOnSuccess}
         schemaId={mockSchemaId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('カテゴリ名'), 'New Category');
@@ -175,7 +179,7 @@ describe('CategoryForm', () => {
           displayOrder: 1,
           schemaId: mockSchemaId,
         },
-        mockToken
+        mockToken,
       );
       expect(mockOnSuccess).toHaveBeenCalled();
     });
@@ -196,8 +200,6 @@ describe('CategoryForm', () => {
       name: 'Updated Category',
       description: 'Updated Description',
       displayOrder: 10,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
       fields: [],
     });
 
@@ -209,7 +211,7 @@ describe('CategoryForm', () => {
         schemaId={mockSchemaId}
         token={mockToken}
         category={category}
-      />
+      />,
     );
 
     const nameInput = screen.getByLabelText('カテゴリ名');
@@ -231,7 +233,7 @@ describe('CategoryForm', () => {
           description: 'Existing Description',
           displayOrder: 10,
         },
-        mockToken
+        mockToken,
       );
       expect(mockOnSuccess).toHaveBeenCalled();
     });
@@ -239,7 +241,9 @@ describe('CategoryForm', () => {
 
   it('should handle API error on submit', async () => {
     const user = userEvent.setup();
-    vi.mocked(schemaApi.createCategory).mockRejectedValue(new Error('API Error'));
+    vi.mocked(schemaApi.createCategory).mockRejectedValue(
+      new Error('API Error'),
+    );
     window.alert = vi.fn();
 
     render(
@@ -249,7 +253,7 @@ describe('CategoryForm', () => {
         onSuccess={mockOnSuccess}
         schemaId={mockSchemaId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('カテゴリ名'), 'New Category');
@@ -273,7 +277,7 @@ describe('CategoryForm', () => {
         onSuccess={mockOnSuccess}
         schemaId={mockSchemaId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('カテゴリ名'), 'New Category');

@@ -32,14 +32,21 @@ export interface Field {
   displayOrder: number;
 }
 
+interface ApiResponse<T> {
+  data: T;
+}
+
 export const schemaApi = {
   /**
    * スキーマを取得
    */
   getSchema: async (schemaId: string, token: string): Promise<Schema> => {
-    const response = await axios.get(`${API_URL}/api/schema/${schemaId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await axios.get<ApiResponse<Schema>>(
+      `${API_URL}/api/schema/${schemaId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return response.data.data;
   },
 
@@ -53,11 +60,15 @@ export const schemaApi = {
       description?: string;
       displayOrder: number;
     },
-    token: string
-  ) => {
-    const response = await axios.post(`${API_URL}/api/schema/categories`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    token: string,
+  ): Promise<Category> => {
+    const response = await axios.post<ApiResponse<Category>>(
+      `${API_URL}/api/schema/categories`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return response.data.data;
   },
 
@@ -71,14 +82,14 @@ export const schemaApi = {
       description?: string;
       displayOrder?: number;
     },
-    token: string
-  ) => {
-    const response = await axios.put(
+    token: string,
+  ): Promise<Category> => {
+    const response = await axios.put<ApiResponse<Category>>(
       `${API_URL}/api/schema/categories/${id}`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
-      }
+      },
     );
     return response.data.data;
   },
@@ -86,7 +97,7 @@ export const schemaApi = {
   /**
    * カテゴリを削除
    */
-  deleteCategory: async (id: string, token: string) => {
+  deleteCategory: async (id: string, token: string): Promise<void> => {
     await axios.delete(`${API_URL}/api/schema/categories/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -106,11 +117,15 @@ export const schemaApi = {
       placeholderText?: string;
       displayOrder: number;
     },
-    token: string
-  ) => {
-    const response = await axios.post(`${API_URL}/api/schema/fields`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    token: string,
+  ): Promise<Field> => {
+    const response = await axios.post<ApiResponse<Field>>(
+      `${API_URL}/api/schema/fields`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return response.data.data;
   },
 
@@ -128,18 +143,22 @@ export const schemaApi = {
       placeholderText?: string;
       displayOrder?: number;
     },
-    token: string
-  ) => {
-    const response = await axios.put(`${API_URL}/api/schema/fields/${id}`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    token: string,
+  ): Promise<Field> => {
+    const response = await axios.put<ApiResponse<Field>>(
+      `${API_URL}/api/schema/fields/${id}`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return response.data.data;
   },
 
   /**
    * フィールドを削除
    */
-  deleteField: async (id: string, token: string) => {
+  deleteField: async (id: string, token: string): Promise<void> => {
     await axios.delete(`${API_URL}/api/schema/fields/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -148,13 +167,13 @@ export const schemaApi = {
   /**
    * スキーマをデフォルトにリセット
    */
-  resetSchema: async (schemaId: string, token: string) => {
-    const response = await axios.post(
+  resetSchema: async (schemaId: string, token: string): Promise<Schema> => {
+    const response = await axios.post<ApiResponse<Schema>>(
       `${API_URL}/api/schema/reset`,
       { schemaId },
       {
         headers: { Authorization: `Bearer ${token}` },
-      }
+      },
     );
     return response.data.data;
   },

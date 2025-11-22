@@ -13,13 +13,21 @@ interface ProtectedRouteProps {
   requireAdmin?: boolean;
 }
 
-function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+function ProtectedRoute({
+  children,
+  requireAdmin = false,
+}: ProtectedRouteProps) {
   const { isAuthenticated, isAdmin, token } = useAuth();
 
   // トークンがまだロード中の場合はローディング表示
   if (token === null && localStorage.getItem('authToken')) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <CircularProgress />
       </Box>
     );

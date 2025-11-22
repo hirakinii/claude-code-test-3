@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { loginHandler } from '../controllers/authController';
 
 const router = Router();
@@ -7,6 +7,6 @@ const router = Router();
  * POST /api/auth/login
  * ユーザーログイン
  */
-router.post('/login', loginHandler);
+router.post('/login', loginHandler as RequestHandler);
 
 export default router;

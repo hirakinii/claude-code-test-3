@@ -24,7 +24,7 @@ export function requireRole(...allowedRoles: string[]) {
       // ユーザーのロールをチェック
       const userRoles = req.user.roles || [];
       const hasRequiredRole = allowedRoles.some((role) =>
-        userRoles.includes(role)
+        userRoles.includes(role),
       );
 
       if (!hasRequiredRole) {

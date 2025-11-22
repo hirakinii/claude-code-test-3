@@ -34,7 +34,7 @@ export const authApi = {
   login: async (data: LoginRequest): Promise<LoginResponse['data']> => {
     const response = await axios.post<LoginResponse>(
       `${API_URL}/api/auth/login`,
-      data
+      data,
     );
     return response.data.data;
   },

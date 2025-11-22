@@ -5,7 +5,7 @@ import { logger } from './utils/logger';
 
 const PORT = process.env.PORT || 3001;
 
-async function main(): Promise<void> {
+function main(): void {
   try {
     const app = createServer();
 
@@ -17,7 +17,7 @@ async function main(): Promise<void> {
     });
 
     // Graceful shutdown
-    const shutdown = async (): Promise<void> => {
+    const shutdown = (): void => {
       logger.info('Received shutdown signal, closing server gracefully...');
 
       server.close(() => {
@@ -40,4 +40,4 @@ async function main(): Promise<void> {
   }
 }
 
-main();
+void main();

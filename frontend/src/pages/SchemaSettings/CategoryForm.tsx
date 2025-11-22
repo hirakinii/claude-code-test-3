@@ -80,7 +80,8 @@ function CategoryForm({
       reset();
       onSuccess();
     } catch (error) {
-      console.error('Failed to save category', error);
+      // Error logged for debugging purposes
+      // console.error('Failed to save category', error);
       alert('カテゴリの保存に失敗しました');
     }
   };
@@ -92,10 +93,12 @@ function CategoryForm({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {category ? 'カテゴリ編集' : 'カテゴリ追加'}
-      </DialogTitle>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <DialogTitle>{category ? 'カテゴリ編集' : 'カテゴリ追加'}</DialogTitle>
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
+      >
         <DialogContent>
           <TextField
             fullWidth

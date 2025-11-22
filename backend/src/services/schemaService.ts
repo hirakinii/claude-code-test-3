@@ -1,13 +1,27 @@
-import { PrismaClient } from '@prisma/client';
+import {
+  PrismaClient,
+  Schema,
+  SchemaCategory,
+  SchemaField,
+} from '@prisma/client';
 import { logger } from '../utils/logger';
 
 const prisma = new PrismaClient();
+
+// Type for Schema with nested relations
+type SchemaWithRelations = Schema & {
+  categories: (SchemaCategory & {
+    fields: SchemaField[];
+  })[];
+};
 
 /**
  * スキーマをIDで取得
  * カテゴリとフィールドを含む完全なスキーマ定義を返す
  */
-export async function getSchemaById(schemaId: string) {
+export async function getSchemaById(
+  schemaId: string,
+): Promise<SchemaWithRelations> {
   try {
     const schema = await prisma.schema.findUnique({
       where: { id: schemaId },
@@ -43,7 +57,7 @@ export async function createCategory(data: {
   name: string;
   description?: string;
   displayOrder: number;
-}) {
+}): Promise<SchemaCategory> {
   try {
     // スキーマの存在確認
     const schema = await prisma.schema.findUnique({
@@ -81,8 +95,8 @@ export async function updateCategory(
     name?: string;
     description?: string;
     displayOrder?: number;
-  }
-) {
+  },
+): Promise<SchemaCategory> {
   try {
     // 存在確認
     const existingCategory = await prisma.schemaCategory.findUnique({
@@ -110,7 +124,9 @@ export async function updateCategory(
 /**
  * カテゴリを削除（カスケード削除）
  */
-export async function deleteCategory(id: string) {
+export async function deleteCategory(
+  id: string,
+): Promise<{ success: boolean }> {
   try {
     // 存在確認
     const existingCategory = await prisma.schemaCategory.findUnique({
@@ -146,7 +162,7 @@ export async function createField(data: {
   listTargetEntity?: string | null;
   placeholderText?: string | null;
   displayOrder: number;
-}) {
+}): Promise<SchemaField> {
   try {
     // カテゴリの存在確認
     const category = await prisma.schemaCategory.findUnique({
@@ -158,7 +174,10 @@ export async function createField(data: {
     }
 
     // データ型別バリデーション
-    if ((data.dataType === 'RADIO' || data.dataType === 'CHECKBOX') && !data.options) {
+    if (
+      (data.dataType === 'RADIO' || data.dataType === 'CHECKBOX') &&
+      !data.options
+    ) {
       throw new Error('Options are required for RADIO/CHECKBOX data type');
     }
 
@@ -201,8 +220,8 @@ export async function updateField(
     listTargetEntity?: string | null;
     placeholderText?: string | null;
     displayOrder?: number;
-  }
-) {
+  },
+): Promise<SchemaField> {
   try {
     // 存在確認
     const existingField = await prisma.schemaField.findUnique({
@@ -215,9 +234,15 @@ export async function updateField(
 
     // データ型別バリデーション
     const dataType = data.dataType || existingField.dataType;
-    if ((dataType === 'RADIO' || dataType === 'CHECKBOX') && data.options === undefined) {
+    if (
+      (dataType === 'RADIO' || dataType === 'CHECKBOX') &&
+      data.options === undefined
+    ) {
       // 既存のoptionsを維持
-    } else if ((dataType === 'RADIO' || dataType === 'CHECKBOX') && !data.options) {
+    } else if (
+      (dataType === 'RADIO' || dataType === 'CHECKBOX') &&
+      !data.options
+    ) {
       throw new Error('Options are required for RADIO/CHECKBOX data type');
     }
 
@@ -238,7 +263,7 @@ export async function updateField(
 /**
  * フィールドを削除
  */
-export async function deleteField(id: string) {
+export async function deleteField(id: string): Promise<{ success: boolean }> {
   try {
     // 存在確認
     const existingField = await prisma.schemaField.findUnique({
@@ -266,7 +291,9 @@ export async function deleteField(id: string) {
  * スキーマをデフォルト設定にリセット
  * トランザクションで既存データを削除し、シードデータから復元
  */
-export async function resetSchemaToDefault(schemaId: string) {
+export async function resetSchemaToDefault(
+  schemaId: string,
+): Promise<SchemaWithRelations | null> {
   try {
     return await prisma.$transaction(async (tx) => {
       // 1. 既存のカテゴリとフィールドを削除（カスケード）

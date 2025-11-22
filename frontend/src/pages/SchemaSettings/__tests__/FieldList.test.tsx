@@ -32,8 +32,6 @@ describe('FieldList', () => {
     name: 'Category 1',
     description: 'Description 1',
     displayOrder: 1,
-    createdAt: '2025-01-01T00:00:00.000Z',
-    updatedAt: '2025-01-01T00:00:00.000Z',
     fields: [],
   };
 
@@ -43,8 +41,6 @@ describe('FieldList', () => {
     name: 'Category 1',
     description: 'Description 1',
     displayOrder: 1,
-    createdAt: '2025-01-01T00:00:00.000Z',
-    updatedAt: '2025-01-01T00:00:00.000Z',
     fields: [
       {
         id: 'field-1',
@@ -54,8 +50,6 @@ describe('FieldList', () => {
         isRequired: true,
         placeholderText: 'Enter text',
         displayOrder: 1,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
       },
       {
         id: 'field-2',
@@ -65,8 +59,6 @@ describe('FieldList', () => {
         isRequired: false,
         placeholderText: '',
         displayOrder: 2,
-        createdAt: '2025-01-01T00:00:00.000Z',
-        updatedAt: '2025-01-01T00:00:00.000Z',
       },
     ],
   };
@@ -77,7 +69,11 @@ describe('FieldList', () => {
 
   it('should render empty state when no fields', () => {
     render(
-      <FieldList category={mockCategoryWithoutFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithoutFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     expect(screen.getByText('フィールドがありません')).toBeInTheDocument();
@@ -86,7 +82,11 @@ describe('FieldList', () => {
 
   it('should render list of fields', () => {
     render(
-      <FieldList category={mockCategoryWithFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     expect(screen.getByText('Field 1')).toBeInTheDocument();
@@ -95,7 +95,11 @@ describe('FieldList', () => {
 
   it('should display field metadata correctly', () => {
     render(
-      <FieldList category={mockCategoryWithFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     // データ型が表示される
@@ -114,7 +118,11 @@ describe('FieldList', () => {
     const user = userEvent.setup();
 
     render(
-      <FieldList category={mockCategoryWithoutFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithoutFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     const addButton = screen.getByText('フィールドを追加');
@@ -127,11 +135,15 @@ describe('FieldList', () => {
     const user = userEvent.setup();
 
     render(
-      <FieldList category={mockCategoryWithFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     const editButtons = screen.getAllByLabelText('edit');
-    await user.click(editButtons[0]);
+    await user.click(editButtons[0]!);
 
     expect(screen.getByTestId('field-form-mock')).toBeInTheDocument();
   });
@@ -140,7 +152,11 @@ describe('FieldList', () => {
     const user = userEvent.setup();
 
     render(
-      <FieldList category={mockCategoryWithoutFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithoutFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     const addButton = screen.getByText('フィールドを追加');
@@ -161,14 +177,20 @@ describe('FieldList', () => {
     window.confirm = vi.fn(() => true);
 
     render(
-      <FieldList category={mockCategoryWithFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
-      expect(window.confirm).toHaveBeenCalledWith('このフィールドを削除しますか？');
+      expect(window.confirm).toHaveBeenCalledWith(
+        'このフィールドを削除しますか？',
+      );
       expect(schemaApi.deleteField).toHaveBeenCalledWith('field-1', mockToken);
       expect(mockOnUpdate).toHaveBeenCalled();
     });
@@ -179,11 +201,15 @@ describe('FieldList', () => {
     window.confirm = vi.fn(() => false);
 
     render(
-      <FieldList category={mockCategoryWithFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalled();
@@ -193,26 +219,38 @@ describe('FieldList', () => {
   });
 
   it('should handle delete error', async () => {
-    vi.mocked(schemaApi.deleteField).mockRejectedValue(new Error('Delete failed'));
+    vi.mocked(schemaApi.deleteField).mockRejectedValue(
+      new Error('Delete failed'),
+    );
     window.confirm = vi.fn(() => true);
     window.alert = vi.fn();
 
     render(
-      <FieldList category={mockCategoryWithFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('フィールドの削除に失敗しました');
+      expect(window.alert).toHaveBeenCalledWith(
+        'フィールドの削除に失敗しました',
+      );
       expect(mockOnUpdate).not.toHaveBeenCalled();
     });
   });
 
   it('should show correct number of edit and delete buttons', () => {
     render(
-      <FieldList category={mockCategoryWithFields} token={mockToken} onUpdate={mockOnUpdate} />
+      <FieldList
+        category={mockCategoryWithFields}
+        token={mockToken}
+        onUpdate={mockOnUpdate}
+      />,
     );
 
     const editButtons = screen.getAllByLabelText('edit');

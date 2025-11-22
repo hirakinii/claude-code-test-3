@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FieldForm from '../FieldForm';
 import { schemaApi, Field } from '../../../api/schemaApi';
@@ -30,7 +30,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     expect(screen.getByText('フィールド追加')).toBeInTheDocument();
@@ -49,8 +49,6 @@ describe('FieldForm', () => {
       isRequired: true,
       placeholderText: 'Placeholder',
       displayOrder: 5,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
     };
 
     render(
@@ -61,7 +59,7 @@ describe('FieldForm', () => {
         categoryId={mockCategoryId}
         token={mockToken}
         field={field}
-      />
+      />,
     );
 
     expect(screen.getByText('フィールド編集')).toBeInTheDocument();
@@ -80,7 +78,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     const submitButton = screen.getByRole('button', { name: '保存' });
@@ -104,18 +102,20 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     // データ型をRADIOに変更 (最初のcomboboxがデータ型のSelect)
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const radioOption = screen.getByRole('option', { name: 'ラジオボタン' });
     await user.click(radioOption);
 
     // オプションフィールドが表示される
     await waitFor(() => {
-      expect(screen.getByLabelText('オプション（JSON配列）')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('オプション（JSON配列）'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -129,18 +129,22 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     // データ型をCHECKBOXに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
-    const checkboxOption = screen.getByRole('option', { name: 'チェックボックス' });
+    const checkboxOption = screen.getByRole('option', {
+      name: 'チェックボックス',
+    });
     await user.click(checkboxOption);
 
     // オプションフィールドが表示される
     await waitFor(() => {
-      expect(screen.getByLabelText('オプション（JSON配列）')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('オプション（JSON配列）'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -154,11 +158,11 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     // データ型をLISTに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const listOption = screen.getByRole('option', { name: '動的リスト' });
     await user.click(listOption);
@@ -180,19 +184,21 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'Test Field');
 
     // データ型をRADIOに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const radioOption = screen.getByRole('option', { name: 'ラジオボタン' });
     await user.click(radioOption);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('オプション（JSON配列）')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('オプション（JSON配列）'),
+      ).toBeInTheDocument();
     });
 
     // 不正なJSON形式を入力
@@ -203,7 +209,9 @@ describe('FieldForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('オプションのJSON形式が正しくありません');
+      expect(window.alert).toHaveBeenCalledWith(
+        'オプションのJSON形式が正しくありません',
+      );
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
   });
@@ -218,13 +226,13 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'Test Field');
 
     // データ型をLISTに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const listOption = screen.getByRole('option', { name: '動的リスト' });
     await user.click(listOption);
@@ -238,7 +246,9 @@ describe('FieldForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('動的リストでは参照先エンティティは必須です')).toBeInTheDocument();
+      expect(
+        screen.getByText('動的リストでは参照先エンティティは必須です'),
+      ).toBeInTheDocument();
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
   });
@@ -253,8 +263,6 @@ describe('FieldForm', () => {
       isRequired: false,
       placeholderText: 'Enter text',
       displayOrder: 1,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
     });
 
     render(
@@ -264,7 +272,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'New Field');
@@ -283,7 +291,7 @@ describe('FieldForm', () => {
           displayOrder: 1,
           categoryId: mockCategoryId,
         }),
-        mockToken
+        mockToken,
       );
       expect(mockOnSuccess).toHaveBeenCalled();
     });
@@ -300,8 +308,6 @@ describe('FieldForm', () => {
       placeholderText: '',
       displayOrder: 1,
       options: ['Option 1', 'Option 2'],
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
     });
 
     render(
@@ -311,24 +317,28 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'New Radio Field');
 
     // データ型をRADIOに変更
-    const dataTypeSelect = screen.getAllByRole('combobox')[0];
+    const dataTypeSelect = screen.getAllByRole('combobox')[0]!;
     await user.click(dataTypeSelect);
     const radioOption = screen.getByRole('option', { name: 'ラジオボタン' });
     await user.click(radioOption);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('オプション（JSON配列）')).toBeInTheDocument();
+      expect(
+        screen.getByLabelText('オプション（JSON配列）'),
+      ).toBeInTheDocument();
     });
 
     // JSONオプションを入力
     const optionsInput = screen.getByLabelText('オプション（JSON配列）');
-    fireEvent.change(optionsInput, { target: { value: '["Option 1", "Option 2"]' } });
+    fireEvent.change(optionsInput, {
+      target: { value: '["Option 1", "Option 2"]' },
+    });
 
     // 必須項目チェック
     await user.click(screen.getByLabelText('必須項目'));
@@ -345,7 +355,7 @@ describe('FieldForm', () => {
           options: ['Option 1', 'Option 2'],
           categoryId: mockCategoryId,
         }),
-        mockToken
+        mockToken,
       );
       expect(mockOnSuccess).toHaveBeenCalled();
     });
@@ -361,8 +371,6 @@ describe('FieldForm', () => {
       isRequired: true,
       placeholderText: '',
       displayOrder: 5,
-      createdAt: '2025-01-01T00:00:00.000Z',
-      updatedAt: '2025-01-01T00:00:00.000Z',
     };
 
     vi.mocked(schemaApi.updateField).mockResolvedValue({
@@ -378,7 +386,7 @@ describe('FieldForm', () => {
         categoryId={mockCategoryId}
         token={mockToken}
         field={field}
-      />
+      />,
     );
 
     const fieldNameInput = screen.getByLabelText('フィールド名');
@@ -396,7 +404,7 @@ describe('FieldForm', () => {
           dataType: 'TEXT',
           isRequired: true,
         }),
-        mockToken
+        mockToken,
       );
       expect(mockOnSuccess).toHaveBeenCalled();
     });
@@ -414,7 +422,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'New Field');
@@ -423,7 +431,9 @@ describe('FieldForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('フィールドの保存に失敗しました');
+      expect(window.alert).toHaveBeenCalledWith(
+        'フィールドの保存に失敗しました',
+      );
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
   });
@@ -438,7 +448,7 @@ describe('FieldForm', () => {
         onSuccess={mockOnSuccess}
         categoryId={mockCategoryId}
         token={mockToken}
-      />
+      />,
     );
 
     await user.type(screen.getByLabelText('フィールド名'), 'New Field');

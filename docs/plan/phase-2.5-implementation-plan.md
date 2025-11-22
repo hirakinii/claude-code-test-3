@@ -1440,6 +1440,95 @@ Phase 2.5 の実装を**完全完了**しました。以下のマイルストー
 
 **参考**: `frontend/e2e/schema-settings.spec.ts:272-332`
 
+#### CI/CD パイプライン修正 ✅ (2025-11-22)
+
+**セッション目標**: GitHub Actions CI/CDパイプライン（`.github/workflows/ci.yml`）のエラーを解消
+
+**問題1: npm workspaces モノレポ構成への非対応**
+- **原因**: `cache-dependency-path`が`backend/package-lock.json`と`frontend/package-lock.json`を参照していたが、npm workspaces構成ではルートの`package-lock.json`のみ存在
+- **解決策**:
+  - `cache-dependency-path`をルートの`package-lock.json`に変更
+  - 依存関係インストールをルートディレクトリで実行（`npm ci`）
+  - 各ワークスペースの操作は`working-directory`で明示的に指定
+- **コミット**: `0f04351`
+
+**問題2: シードデータ未投入によるテスト失敗**
+- **原因**: `prisma:migrate:prod`実行後に`prisma:seed`が実行されていなかった
+- **解決策**: `backend-test`ジョブに`prisma:seed`ステップを追加
+- **コミット**: `091f5e8`
+
+**問題3: TypeScript ESLintエラー（93エラー）**
+- **原因**: 厳格な型チェックによる各種エラー
+- **解決策**:
+  - `backend/src/types/requests.ts`を新規作成（リクエストボディの型定義）
+  - `authController.ts`, `schemaController.ts`: 適切な型注釈を追加
+  - `index.ts`: 不要な`async`を削除
+  - `schemaService.ts`: 明示的な返り値型を追加
+  - `logger.ts`: テンプレートリテラル内の式を`String()`でラップ
+  - `routes/auth.ts`, `routes/schema.ts`: `RequestHandler`型キャストを追加
+  - `frontend/tsconfig.json`: テストファイルを`exclude`から削除
+  - `schemaApi.ts`: `ApiResponse<T>`インターフェースと返り値型を追加
+  - 各種テストファイル: `createdAt`/`updatedAt`削除、非nullアサーション追加
+- **コミット**: `1d57953`, `3cb61b4`
+
+**問題4: Prettierフォーマットエラー（27ファイル）**
+- **解決策**: `npm run format`を実行してフォーマット修正
+- **コミット**: `c006765`
+
+**問題5: フロントエンドビルドの型エラー**
+- **原因**: `FieldForm.tsx`での`options`の型不一致、テストファイルのモック型不一致
+- **解決策**:
+  - `FieldForm.tsx`: `payload`構築時にスプレッドを避け、各プロパティを明示的に設定
+  - テストファイル: モックオブジェクトを正しいインターフェースに合わせて修正
+- **コミット**: `a5d9193`
+
+**問題6: E2Eテストのフロントエンドポート不一致**
+- **原因**: `vite.config.ts`ではポート3000を使用しているが、CIでは5173を期待
+- **解決策**: `Wait for frontend`ステップのポートを3000に変更
+- **コミット**: `2bb9916`
+
+**問題7: Playwrightのサーバー起動競合**
+- **原因**: CIでは既にサーバーが起動しているが、`reuseExistingServer: !process.env.CI`のため新規起動を試みる
+- **解決策**: `playwright.config.ts`で`reuseExistingServer: true`に変更
+- **コミット**: `2dc15e3`
+
+**修正ファイル一覧**:
+
+| ファイル | 修正内容 |
+|---------|---------|
+| `.github/workflows/ci.yml` | npm workspaces対応、prisma:seed追加、ポート修正 |
+| `frontend/tsconfig.json` | テストファイルをexcludeから削除 |
+| `frontend/playwright.config.ts` | reuseExistingServer: true |
+| `backend/src/types/requests.ts` | 新規作成（型定義） |
+| `backend/src/controllers/authController.ts` | 型注釈追加 |
+| `backend/src/controllers/schemaController.ts` | 型注釈追加 |
+| `backend/src/index.ts` | async削除 |
+| `backend/src/services/schemaService.ts` | 返り値型追加 |
+| `backend/src/utils/logger.ts` | テンプレートリテラル修正 |
+| `backend/src/routes/auth.ts` | RequestHandler型キャスト |
+| `backend/src/routes/schema.ts` | RequestHandler型キャスト |
+| `frontend/src/api/schemaApi.ts` | ApiResponse型、返り値型追加 |
+| `frontend/src/pages/SchemaSettings/FieldForm.tsx` | payload構築修正 |
+| 各種テストファイル（8ファイル） | 型エラー修正 |
+| 27ファイル | Prettierフォーマット修正 |
+
+**コミット履歴（このセッション）**:
+- `0f04351`: fix(ci): Adapt CI pipeline for npm workspaces monorepo structure
+- `1d57953`: fix(lint): Resolve all TypeScript ESLint errors in backend and frontend
+- `3cb61b4`: fix(lint): Resolve remaining TypeScript ESLint errors
+- `c006765`: style: Fix Prettier formatting issues in backend and frontend
+- `091f5e8`: fix(ci): Add prisma:seed step to backend test job
+- `a5d9193`: fix(types): Resolve TypeScript build errors in frontend
+- `2bb9916`: fix(ci): Correct frontend port from 5173 to 3000 in E2E test
+- `2dc15e3`: fix(e2e): Set reuseExistingServer to true in Playwright config
+
+**CI/CDパイプライン状況**:
+- ✅ Backend - Build & Test: 通過（カバレッジ警告あり）
+- ✅ Frontend - Build & Test: 通過
+- ✅ E2E Tests (Playwright): 通過
+- ⚠️ Security Audit: 警告あり（脆弱性）
+- ⏳ CD (Staging/Production): 未対応
+
 #### Phase 3 準備
 
 1. **Phase 2.5 完全完了の確認** ✅
@@ -1457,6 +1546,6 @@ Phase 2.5 の実装を**完全完了**しました。以下のマイルストー
 ---
 
 **作成者**: Claude
-**最終更新**: 2025-11-21
-**バージョン**: 2.4.0
-**ステータス**: Phase 2.5 完全完了 ✅
+**最終更新**: 2025-11-22
+**バージョン**: 2.5.0
+**ステータス**: Phase 2.5 完全完了 ✅ + CI/CD修正完了

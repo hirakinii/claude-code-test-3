@@ -7,10 +7,8 @@ import { config } from '../config/env';
  * テスト環境: 1秒あたり1000リクエスト（緩い制限で動作確認のみ）
  */
 export const generalLimiter = rateLimit({
-  windowMs:
-    process.env.NODE_ENV === 'test' ? 1000 : config.rateLimitWindowMs,
-  max:
-    process.env.NODE_ENV === 'test' ? 1000 : config.rateLimitMaxRequests,
+  windowMs: process.env.NODE_ENV === 'test' ? 1000 : config.rateLimitWindowMs,
+  max: process.env.NODE_ENV === 'test' ? 1000 : config.rateLimitMaxRequests,
   message: {
     success: false,
     error: {

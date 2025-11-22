@@ -29,7 +29,7 @@ export interface LoginResponse {
  * @throws Error 認証失敗時
  */
 export async function login(
-  credentials: LoginCredentials
+  credentials: LoginCredentials,
 ): Promise<LoginResponse> {
   const { email, password } = credentials;
 
