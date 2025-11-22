@@ -13,7 +13,7 @@
 - [x] Phase 1 が完了していること ✅ **COMPLETED**
 - [x] データベースが起動していること ✅ **COMPLETED**
 - [x] シードデータが投入されていること ✅ **COMPLETED**
-- [ ] テストユーザーでログインできること ⏳ **PENDING** (Login page not yet implemented)
+- [x] テストユーザーでログインできること ✅ **COMPLETED**
 
 ### ⚠️ 重要: フロントエンドライブラリのバージョン要件
 
@@ -35,11 +35,13 @@
 ```
 
 **注意事項:**
+
 - `^` プレフィックスを使用せず、**exact versions**（厳密バージョン）を指定してください
 - React 19.2.0 は MUI v7 との互換性問題があることが確認されています
 - `npm install` 後に必ず `rm -rf node_modules package-lock.json && npm install` を実行してください
 
 **アーキテクチャ上の変更:**
+
 - **Redux**: Phase 2 ではローカルステート管理のみ使用（Redux は不要）
 - **React.StrictMode**: MUI v7 との互換性のため、一時的に無効化されています
 
@@ -69,6 +71,7 @@ npm run test
 ### Day 1: バックエンド基盤とスキーマ取得API ✅ **COMPLETED**
 
 **実装状況:**
+
 - すべてのテストと実装が完了
 - 39 unit tests + 39 integration tests = 78+ tests (all passing)
 - Test isolation using dedicated test schemas
@@ -154,7 +157,7 @@ import { logger } from '../utils/logger';
 
 export async function getSchemaHandler(
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { schemaId } = req.params;
@@ -235,6 +238,7 @@ npm run test
 ```
 
 **実装完了ファイル:**
+
 - ✅ `backend/src/services/schemaService.ts`
 - ✅ `backend/src/controllers/schemaController.ts`
 - ✅ `backend/src/routes/schema.ts`
@@ -284,7 +288,7 @@ export async function createCategory(data: {
 ```typescript
 export async function createCategoryHandler(
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const { schemaId, name, description, displayOrder } = req.body;
@@ -301,7 +305,12 @@ export async function createCategoryHandler(
       return;
     }
 
-    const category = await createCategory({ schemaId, name, description, displayOrder });
+    const category = await createCategory({
+      schemaId,
+      name,
+      description,
+      displayOrder,
+    });
 
     res.status(201).json({
       success: true,
@@ -328,6 +337,7 @@ router.post('/categories', createCategoryHandler);
 ```
 
 **実装統計:**
+
 - Unit tests for categories: 12 tests (create, update, delete, cascade)
 - Integration tests for categories: 15 tests (API, auth, validation)
 - All tests passing
@@ -339,16 +349,19 @@ router.post('/categories', createCategoryHandler);
 Day 2 と同様の手順で実装完了。
 
 **実装済みの機能:**
+
 - ✅ `dataType` のENUM検証 (TEXT, TEXTAREA, DATE, RADIO, CHECKBOX, LIST)
 - ✅ `options` のJSON検証（RADIO/CHECKBOXの場合）
 - ✅ `listTargetEntity` の必須検証（LISTの場合）
 
 **実装統計:**
+
 - Unit tests for fields: 18 tests (all data types, validation)
 - Integration tests for fields: 13 tests (API, auth, validation)
 - All tests passing
 
 **テスト改善点:**
+
 - UUID validation: エラーケースで有効なUUID形式を使用
 - Test isolation: 専用スキーマで完全にテストを分離
 - Cleanup strategy: 作成したリソースを自動削除
@@ -358,6 +371,7 @@ Day 2 と同様の手順で実装完了。
 ### Day 4: フロントエンド基盤 ✅ **COMPLETED (UI: 100%, Tests: 0%)**
 
 **実装状況:**
+
 - ✅ UI実装完了（7ファイル、~1,159行）
 - ❌ テスト未実装（ログインページ待ち）
 
@@ -383,6 +397,7 @@ touch pages/SchemaSettings/FieldForm.tsx
 ```
 
 **実装完了ファイル:**
+
 - ✅ `frontend/src/api/schemaApi.ts` (162行)
 - ✅ `frontend/src/hooks/useSchema.ts` (45行)
 - ✅ `frontend/src/pages/SchemaSettings/index.tsx` (~200行)
@@ -426,6 +441,7 @@ function App() {
 ```
 
 **主要機能:**
+
 - ✅ ドラッグ&ドロップ実装（@dnd-kit使用）
 - ✅ react-hook-form使用
 - ✅ Material-UI v7.3.2使用
@@ -462,6 +478,7 @@ npm run test -- --coverage
 ```
 
 **テスト統計:**
+
 - **Unit Tests**: 39 tests
   - getSchemaById: 5 tests
   - Category CRUD: 13 tests
@@ -475,6 +492,7 @@ npm run test -- --coverage
   - All with authentication/authorization testing
 
 **主要なテスト機能:**
+
 - ✅ Test isolation (dedicated test schemas)
 - ✅ Automatic cleanup (afterEach/afterAll)
 - ✅ UUID validation for error cases
@@ -495,14 +513,17 @@ npm run test:e2e
 ```
 
 **実装状況:**
+
 - ❌ Component tests (CategoryList.test.tsx) not yet implemented
 - ❌ E2E tests not yet implemented
 
 **理由:**
+
 - ログインページが未実装のため、schema settings画面のテストがブロックされている
 - Phase 2 では TDD 原則に従い、バックエンド API 実装を優先
 
 **実装予定:**
+
 - ログインページ実装完了後（別セッションで対応予定）
 - Phase 2.5 または Phase 3 の一部として実施
 
@@ -515,6 +536,7 @@ npm run test:e2e
 #### 問題 1: "Element type is invalid" エラー（ThemeProvider関連）
 
 **エラー内容:**
+
 ```
 Error: Element type is invalid: expected a string (for built-in components)
 or a class/function (for composite components) but got: object.
@@ -522,10 +544,12 @@ Check the render method of ThemeProvider3.
 ```
 
 **原因:**
+
 - React 19.2.0 と Material-UI v7.3.5 の組み合わせに互換性問題
 - React.StrictMode がMUI v7のネストされたThemeProviderと衝突
 
 **解決方法:**
+
 ```bash
 cd frontend
 
@@ -545,10 +569,12 @@ npm install
 #### 問題 2: Redux Store エラー（"Store does not have a valid reducer"）
 
 **原因:**
+
 - Redux Toolkit は空の reducer オブジェクト `reducer: {}` を許可しない
 - Phase 2 ではグローバルステート管理が不要
 
 **解決方法:**
+
 ```bash
 # Redux 関連ファイルを削除
 rm -rf frontend/src/store
@@ -560,18 +586,22 @@ rm -rf frontend/src/store
 #### 問題 3: 無限ローディングスピナー（/settings/schema ページ）
 
 **原因:**
+
 - `useSchema` フックで token が空文字列の場合、`loading` が `true` のまま更新されない
 
 **解決方法:**
+
 - `frontend/src/hooks/useSchema.ts` で token チェックを追加済み
 - 認証なしでアクセスすると適切な警告メッセージを表示
 
 #### 問題 4: Button component prop エラー
 
 **原因:**
+
 - Material-UI Button の `component={Link}` プロップが React 19 と互換性なし
 
 **解決方法:**
+
 ```typescript
 // 修正前
 <Button component={Link} to="/settings/schema">
@@ -653,6 +683,7 @@ git commit -m "test(schema): Add integration tests for schema API"
 **完了した作業（100%）:**
 
 **Phase 2 (Backend & Frontend UI):**
+
 1. ✅ バックエンドAPI実装 (Schema, Category, Field CRUD - 8エンドポイント、904行)
 2. ✅ ユニットテスト (39 tests, 80%+ coverage)
 3. ✅ 統合テスト (39 tests, authentication/authorization)
@@ -661,26 +692,22 @@ git commit -m "test(schema): Add integration tests for schema API"
 6. ✅ ドラッグ&ドロップ機能 (@dnd-kit)
 7. ✅ React 19.x + MUI v7 互換性問題の解決
 
-**Phase 2.5 (Login & Tests):**
-8. ✅ ログインページの実装 (Login, AuthContext, ProtectedRoute)
-9. ✅ フロントエンドコンポーネントテスト (59 tests, 85-100% coverage)
-10. ✅ E2Eテスト (21 tests: login 10, schema-settings 11)
-11. ✅ E2Eテストクリーンアップ問題の解決 (UIベース→APIベース) **NEW**
-12. ✅ 実装計画書・ドキュメント更新完了
-13. ✅ CI/CD統合 (GitHub Actions)
+**Phase 2.5 (Login & Tests):** 8. ✅ ログインページの実装 (Login, AuthContext, ProtectedRoute) 9. ✅ フロントエンドコンポーネントテスト (59 tests, 85-100% coverage) 10. ✅ E2Eテスト (21 tests: login 10, schema-settings 11) 11. ✅ E2Eテストクリーンアップ問題の解決 (UIベース→APIベース) **NEW** 12. ✅ 実装計画書・ドキュメント更新完了 13. ✅ CI/CD統合 (GitHub Actions)
 
 **完了基準達成:**
+
 - ✅ 全機能実装完了 (100%)
 - ✅ 全テストパス (Backend: 78 tests, Frontend: 59 tests, E2E: 21 tests)
 - ✅ テストカバレッジ目標達成 (80%+)
 - ✅ E2Eテストの信頼性向上 (API-based cleanup)
 
 **次のアクション:**
+
 1. ✅ E2Eクリーンアップ問題解決完了
 2. ✅ ドキュメント更新完了
-3. 🔄 変更をcommit & push
+3. ✅ 変更をcommit & push
 4. ✅ Phase 2/2.5 完全完了
-5. リポジトリオーナーにレビュー依頼
+5. ✅ リポジトリオーナーにレビュー依頼
 6. Phase 3 実装計画の策定
 
 ---
@@ -704,21 +731,22 @@ Phase 2 実装中に **React 19.2.0 と Material-UI v7.3.5 の組み合わせで
 
 #### ライブラリバージョンの変更
 
-| ライブラリ | 元のバージョン | 修正後のバージョン | 理由 |
-|----------|--------------|-----------------|------|
-| react | 19.2.0 | **19.1.1** (exact) | MUI v7との互換性確保 |
-| react-dom | 19.2.0 | **19.1.1** (exact) | Reactに合わせて統一 |
-| @mui/material | 7.3.5 | **7.3.2** (exact) | React 19.1.1との互換性確保 |
-| @mui/icons-material | 7.3.5 | **7.3.2** (exact) | MUIのバージョン統一 |
-| @types/react | 19.2.6 | **19.1.1** (exact) | Reactに合わせた型定義 |
-| @types/react-dom | 19.2.3 | **19.1.1** (exact) | React DOMに合わせた型定義 |
-| react-router-dom | 6.21.1 | **7.9.1** | 最新安定版へ更新 |
+| ライブラリ          | 元のバージョン | 修正後のバージョン | 理由                       |
+| ------------------- | -------------- | ------------------ | -------------------------- |
+| react               | 19.2.0         | **19.1.1** (exact) | MUI v7との互換性確保       |
+| react-dom           | 19.2.0         | **19.1.1** (exact) | Reactに合わせて統一        |
+| @mui/material       | 7.3.5          | **7.3.2** (exact)  | React 19.1.1との互換性確保 |
+| @mui/icons-material | 7.3.5          | **7.3.2** (exact)  | MUIのバージョン統一        |
+| @types/react        | 19.2.6         | **19.1.1** (exact) | Reactに合わせた型定義      |
+| @types/react-dom    | 19.2.3         | **19.1.1** (exact) | React DOMに合わせた型定義  |
+| react-router-dom    | 6.21.1         | **7.9.1**          | 最新安定版へ更新           |
 
 **重要**: `package.json` で `^` プレフィックスを削除し、exact versionsを指定しています。これにより、`npm install` 時に意図しないバージョンアップを防ぎます。
 
 #### アーキテクチャの簡素化
 
 **1. Redux の削除**
+
 - **理由**: Phase 2 の機能はローカルステート管理で十分
 - **削除ファイル**: `frontend/src/store/index.ts`
 - **影響範囲**: `main.tsx`, `App.tsx` から Redux Provider を削除
@@ -728,6 +756,7 @@ Phase 2 実装中に **React 19.2.0 と Material-UI v7.3.5 の組み合わせで
   - デバッグの簡素化
 
 **2. React.StrictMode の無効化**
+
 - **理由**: React 19 の StrictMode が MUI v7 の ThemeProvider とコンフリクト
 - **影響ファイル**: `frontend/src/main.tsx`
 - **将来の対応**: MUI が React 19 を完全サポート後に再有効化を検討
@@ -735,6 +764,7 @@ Phase 2 実装中に **React 19.2.0 と Material-UI v7.3.5 の組み合わせで
 #### フロントエンド構造の変更
 
 **新規作成されたファイル:**
+
 ```
 frontend/src/
 ├── api/
@@ -751,6 +781,7 @@ frontend/src/
 ```
 
 **削除されたファイル:**
+
 ```
 frontend/src/
 └── store/
@@ -758,6 +789,7 @@ frontend/src/
 ```
 
 **修正されたファイル:**
+
 - `frontend/src/main.tsx`: Redux Provider 削除、StrictMode 削除
 - `frontend/src/App.tsx`: Redux imports 削除、lazy loading 追加、Button navigation 修正
 - `frontend/package.json`: バージョン修正（exact versions）
@@ -765,30 +797,35 @@ frontend/src/
 #### 発生した問題と解決策
 
 **問題 1: ThemeProvider エラー**
+
 - **エラー**: "Element type is invalid ... ThemeProvider3"
 - **原因**: React 19.2.0 + MUI v7.3.5 の互換性問題
 - **解決**: React 19.1.1 + MUI 7.3.2 へダウングレード
 - **コミット**: `8767559`
 
 **問題 2: Redux Store エラー**
+
 - **エラー**: "Store does not have a valid reducer"
 - **原因**: Redux Toolkit が空の reducer を許可しない
 - **解決**: Redux を完全削除
 - **コミット**: `b4d479c`
 
 **問題 3: 無限ローディングスピナー**
+
 - **エラー**: `/settings/schema` ページでスピナーが永続表示
 - **原因**: token が空の場合に `loading` が `true` のまま
 - **解決**: `useSchema` フックで token チェックを追加し、適切なエラーメッセージを表示
 - **コミット**: `1b91e1b`
 
 **問題 4: StrictMode による二重レンダリング**
+
 - **エラー**: MUI コンポーネントの警告・エラー
 - **原因**: React 19 の StrictMode が MUI v7 と完全互換でない
 - **解決**: StrictMode を一時的に無効化
 - **コミット**: `0d0aeeb`
 
 **問題 5: Button component prop**
+
 - **エラー**: `component={Link}` が React 19 で動作しない
 - **原因**: React 19 の変更により、一部の prop が非推奨
 - **解決**: `useNavigate` フックを使用したナビゲーションに変更
@@ -820,28 +857,31 @@ npm run dev
 
 #### 全コミット履歴
 
-| コミットハッシュ | 説明 |
-|---------------|------|
-| `a49038f` | fix(frontend): Add lazy loading for SchemaSettings component |
-| `3a386e6` | fix(frontend): Replace Button component prop with useNavigate hook |
-| `0d0aeeb` | fix(frontend): Remove React.StrictMode to resolve ThemeProvider error |
-| `8767559` | fix(frontend): Downgrade to stable React 19.1.1 and MUI 7.3.2 |
-| `1b91e1b` | fix(frontend): Fix infinite loading spinner when auth token is missing |
-| `b4d479c` | fix(frontend): Remove Redux store to resolve empty reducer error |
+| コミットハッシュ | 説明                                                                   |
+| ---------------- | ---------------------------------------------------------------------- |
+| `a49038f`        | fix(frontend): Add lazy loading for SchemaSettings component           |
+| `3a386e6`        | fix(frontend): Replace Button component prop with useNavigate hook     |
+| `0d0aeeb`        | fix(frontend): Remove React.StrictMode to resolve ThemeProvider error  |
+| `8767559`        | fix(frontend): Downgrade to stable React 19.1.1 and MUI 7.3.2          |
+| `1b91e1b`        | fix(frontend): Fix infinite loading spinner when auth token is missing |
+| `b4d479c`        | fix(frontend): Remove Redux store to resolve empty reducer error       |
 
 #### 影響を受けるセクション
 
 **前提条件セクション**:
+
 - 厳密なバージョン要件を明記
 - exact versions の重要性を強調
 - アーキテクチャの変更（Redux 削除、StrictMode 無効化）を説明
 
 **トラブルシューティングセクション**:
+
 - React 19.x + MUI v7 互換性問題の詳細を追加
 - 5つの問題とその解決策を文書化
 - 再現可能な手順と回避策を提供
 
 **Day 4: フロントエンド基盤セクション**:
+
 - クリーンインストール手順を追加
 - バージョン確認ステップを追加
 - ThemeProvider エラーの確認ポイントを追加
@@ -849,15 +889,18 @@ npm run dev
 #### 将来の考慮事項
 
 **バージョンアップの方針:**
+
 - React 19.2.x 以降へのアップグレードは慎重に検討
 - MUI の React 19 完全サポートを待つ
 - アップグレード前に必ずローカル環境で検証
 
 **React.StrictMode の再有効化:**
+
 - MUI v7 が React 19 を完全サポートしたタイミングで検討
 - 再有効化前に全コンポーネントのテストを実施
 
 **Redux の再導入:**
+
 - Phase 3 以降でグローバルステート管理が必要になった場合に検討
 - 現時点では YAGNI 原則に従い導入しない
 
