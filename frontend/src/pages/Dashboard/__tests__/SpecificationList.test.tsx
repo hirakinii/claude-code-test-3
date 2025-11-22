@@ -123,7 +123,9 @@ describe('SpecificationList', () => {
     renderWithRouter(<SpecificationList {...defaultProps} />);
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    const firstDeleteButton = deleteButtons[0];
+    expect(firstDeleteButton).toBeDefined();
+    fireEvent.click(firstDeleteButton!);
 
     expect(window.confirm).toHaveBeenCalled();
     expect(defaultProps.onDelete).toHaveBeenCalledWith('1');
@@ -135,7 +137,9 @@ describe('SpecificationList', () => {
     renderWithRouter(<SpecificationList {...defaultProps} />);
 
     const deleteButtons = screen.getAllByLabelText('delete');
-    fireEvent.click(deleteButtons[0]);
+    const firstDeleteButton = deleteButtons[0];
+    expect(firstDeleteButton).toBeDefined();
+    fireEvent.click(firstDeleteButton!);
 
     expect(window.confirm).toHaveBeenCalled();
     expect(defaultProps.onDelete).not.toHaveBeenCalled();
