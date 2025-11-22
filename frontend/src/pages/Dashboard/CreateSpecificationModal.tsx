@@ -41,9 +41,10 @@ function CreateSpecificationModal({
 
       onSuccess();
       // 作成後、編集画面へ遷移
-      navigate(`/specifications/${specification.id}/edit`);
+      void navigate(`/specifications/${specification.id}/edit`);
     } catch (err) {
       setError('仕様書の作成に失敗しました');
+      // eslint-disable-next-line no-console
       console.error('Failed to create specification:', err);
     } finally {
       setLoading(false);
@@ -75,7 +76,7 @@ function CreateSpecificationModal({
           キャンセル
         </Button>
         <Button
-          onClick={handleCreate}
+          onClick={() => void handleCreate()}
           variant="contained"
           disabled={loading}
           startIcon={loading ? <CircularProgress size={20} /> : null}

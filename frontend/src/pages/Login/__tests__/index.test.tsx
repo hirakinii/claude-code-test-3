@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Login from '../index';
-import * as AuthContext from '../../../contexts/AuthContext';
+import * as useAuthHook from '../../../hooks/useAuth';
 
 // AuthContext のモック
 const mockLogin = vi.fn();
@@ -26,8 +26,8 @@ describe('Login Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // AuthContext のモック
-    vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+    // useAuth のモック
+    vi.spyOn(useAuthHook, 'useAuth').mockReturnValue({
       user: null,
       token: null,
       login: mockLogin,

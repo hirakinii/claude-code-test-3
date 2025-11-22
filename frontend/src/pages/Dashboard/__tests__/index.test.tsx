@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Dashboard from '../index';
-import * as AuthContext from '../../../contexts/AuthContext';
+import * as useAuthHook from '../../../hooks/useAuth';
 import * as specificationApi from '../../../api/specificationApi';
 
 vi.mock('../../../api/specificationApi', () => ({
@@ -64,7 +64,7 @@ describe('Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock useAuth to return authenticated state
-    vi.spyOn(AuthContext, 'useAuth').mockReturnValue(mockAuthContext);
+    vi.spyOn(useAuthHook, 'useAuth').mockReturnValue(mockAuthContext);
     (
       specificationApi.specificationApi.getSpecifications as ReturnType<
         typeof vi.fn
@@ -101,6 +101,7 @@ describe('Dashboard', () => {
       specificationApi.specificationApi.getSpecifications as ReturnType<
         typeof vi.fn
       >
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     ).mockImplementation(() => new Promise(() => {}));
 
     renderWithProviders(<Dashboard />);

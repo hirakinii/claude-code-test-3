@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter, Routes, Route, MemoryRouter } from 'react-router-dom';
 import ProtectedRoute from '../ProtectedRoute';
-import * as AuthContext from '../../contexts/AuthContext';
+import * as useAuthHook from '../../hooks/useAuth';
 
 describe('ProtectedRoute', () => {
   const TestComponent = () => <div>Protected Content</div>;
@@ -19,7 +19,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('should render children when user is authenticated', () => {
-    vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+    vi.spyOn(useAuthHook, 'useAuth').mockReturnValue({
       user: {
         id: '1',
         email: 'test@example.com',
@@ -53,7 +53,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('should redirect to login when user is not authenticated', () => {
-    vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+    vi.spyOn(useAuthHook, 'useAuth').mockReturnValue({
       user: null,
       token: null,
       login: vi.fn(),
@@ -83,7 +83,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('should redirect to unauthorized page when user is not admin but admin is required', () => {
-    vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+    vi.spyOn(useAuthHook, 'useAuth').mockReturnValue({
       user: {
         id: '1',
         email: 'creator@example.com',
@@ -120,7 +120,7 @@ describe('ProtectedRoute', () => {
   });
 
   it('should render children when user is admin and admin is required', () => {
-    vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
+    vi.spyOn(useAuthHook, 'useAuth').mockReturnValue({
       user: {
         id: '1',
         email: 'admin@example.com',

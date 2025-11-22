@@ -42,6 +42,7 @@ export function useSpecifications(token: string | null): UseSpecificationsReturn
       setError(null);
     } catch (err) {
       setError('仕様書の取得に失敗しました');
+      // eslint-disable-next-line no-console
       console.error('Failed to fetch specifications:', err);
     } finally {
       setLoading(false);
@@ -49,7 +50,7 @@ export function useSpecifications(token: string | null): UseSpecificationsReturn
   }, [token, params]);
 
   useEffect(() => {
-    fetchSpecifications();
+    void fetchSpecifications();
   }, [fetchSpecifications]);
 
   const setPage = useCallback((page: number) => {
@@ -72,6 +73,7 @@ export function useSpecifications(token: string | null): UseSpecificationsReturn
       return newSpec;
     } catch (err) {
       setError('仕様書の作成に失敗しました');
+      // eslint-disable-next-line no-console
       console.error('Failed to create specification:', err);
       return null;
     }
@@ -90,6 +92,7 @@ export function useSpecifications(token: string | null): UseSpecificationsReturn
         return true;
       } catch (err) {
         setError('仕様書の削除に失敗しました');
+        // eslint-disable-next-line no-console
         console.error('Failed to delete specification:', err);
         return false;
       }
