@@ -132,7 +132,7 @@ describe('Login Page', () => {
 
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith('admin@example.com', 'Admin123!');
-      expect(mockNavigate).toHaveBeenCalledWith('/settings/schema');
+      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
     });
   });
 

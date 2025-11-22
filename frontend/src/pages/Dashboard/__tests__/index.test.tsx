@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Dashboard from '../index';
-import { AuthProvider } from '../../../contexts/AuthContext';
+import * as AuthContext from '../../../contexts/AuthContext';
 import * as specificationApi from '../../../api/specificationApi';
 
 vi.mock('../../../api/specificationApi', () => ({
@@ -42,45 +42,34 @@ const mockSpecifications = {
   },
 };
 
+const mockAuthContext = {
+  user: {
+    id: 'user-1',
+    email: 'test@example.com',
+    fullName: 'Test User',
+    roles: ['CREATOR'],
+  },
+  token: 'mock-token',
+  login: vi.fn(),
+  logout: vi.fn(),
+  isAuthenticated: true,
+  isAdmin: false,
+};
+
 const renderWithProviders = (ui: React.ReactNode) => {
-  // Mock localStorage
-  const mockStorage: Record<string, string> = {
-    authToken: 'mock-token',
-    authUser: JSON.stringify({
-      id: 'user-1',
-      email: 'test@example.com',
-      fullName: 'Test User',
-      roles: ['CREATOR'],
-    }),
-  };
-
-  vi.spyOn(Storage.prototype, 'getItem').mockImplementation(
-    (key: string) => mockStorage[key] || null,
-  );
-  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(
-    (key: string, value: string) => {
-      mockStorage[key] = value;
-    },
-  );
-  vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(
-    (key: string) => {
-      delete mockStorage[key];
-    },
-  );
-
-  return render(
-    <BrowserRouter>
-      <AuthProvider>{ui}</AuthProvider>
-    </BrowserRouter>,
-  );
+  return render(<BrowserRouter>{ui}</BrowserRouter>);
 };
 
 describe('Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (specificationApi.specificationApi.getSpecifications as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockSpecifications,
-    );
+    // Mock useAuth to return authenticated state
+    vi.spyOn(AuthContext, 'useAuth').mockReturnValue(mockAuthContext);
+    (
+      specificationApi.specificationApi.getSpecifications as ReturnType<
+        typeof vi.fn
+      >
+    ).mockResolvedValue(mockSpecifications);
   });
 
   it('should render dashboard title', async () => {
@@ -108,9 +97,11 @@ describe('Dashboard', () => {
   });
 
   it('should show loading spinner initially', () => {
-    (specificationApi.specificationApi.getSpecifications as ReturnType<typeof vi.fn>).mockImplementation(
-      () => new Promise(() => {}),
-    );
+    (
+      specificationApi.specificationApi.getSpecifications as ReturnType<
+        typeof vi.fn
+      >
+    ).mockImplementation(() => new Promise(() => {}));
 
     renderWithProviders(<Dashboard />);
 
@@ -118,14 +109,18 @@ describe('Dashboard', () => {
   });
 
   it('should show error message when API fails', async () => {
-    (specificationApi.specificationApi.getSpecifications as ReturnType<typeof vi.fn>).mockRejectedValue(
-      new Error('API Error'),
-    );
+    (
+      specificationApi.specificationApi.getSpecifications as ReturnType<
+        typeof vi.fn
+      >
+    ).mockRejectedValue(new Error('API Error'));
 
     renderWithProviders(<Dashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText('仕様書の取得に失敗しました')).toBeInTheDocument();
+      expect(
+        screen.getByText('仕様書の取得に失敗しました'),
+      ).toBeInTheDocument();
     });
   });
 
