@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -64,6 +65,21 @@ function FieldForm({
   });
 
   const dataType = watch('dataType');
+
+  // Reset form values when dialog opens or field prop changes
+  useEffect(() => {
+    if (open) {
+      reset({
+        fieldName: field?.fieldName || '',
+        dataType: field?.dataType || 'TEXT',
+        isRequired: field?.isRequired || false,
+        placeholderText: field?.placeholderText || '',
+        displayOrder: field?.displayOrder || 1,
+        options: field?.options ? JSON.stringify(field.options) : '',
+        listTargetEntity: field?.listTargetEntity || '',
+      });
+    }
+  }, [open, field, reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
