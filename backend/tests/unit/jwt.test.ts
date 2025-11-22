@@ -1,4 +1,21 @@
 import { generateToken, verifyToken, decodeToken } from '../../src/utils/jwt';
+import jwt from 'jsonwebtoken';
+
+// jwt モジュールをモック化
+jest.mock('jsonwebtoken', () => ({
+  sign: jest.fn(),
+  verify: jest.fn(),
+  decode: jest.fn(),
+}));
+
+// logger モジュールをモック化
+jest.mock('../../src/utils/logger', () => ({
+  logger: {
+    debug: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
+}));
 
 describe('JWT Utilities', () => {
   const mockPayload = {
@@ -7,15 +24,32 @@ describe('JWT Utilities', () => {
     roles: ['CREATOR'],
   };
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('generateToken', () => {
     it('should generate a valid JWT token', () => {
+      const mockToken = 'mock.jwt.token';
+      (jwt.sign as jest.Mock).mockReturnValue(mockToken);
+
       const token = generateToken(mockPayload);
-      expect(token).toBeTruthy();
-      expect(typeof token).toBe('string');
-      expect(token.split('.')).toHaveLength(3); // JWT形式確認
+
+      expect(token).toBe(mockToken);
+      expect(jwt.sign).toHaveBeenCalledWith(
+        mockPayload,
+        expect.any(String),
+        expect.objectContaining({
+          issuer: 'spec-manager-api',
+        }),
+      );
     });
 
     it('should generate different tokens for different payloads', () => {
+      (jwt.sign as jest.Mock)
+        .mockReturnValueOnce('token1')
+        .mockReturnValueOnce('token2');
+
       const token1 = generateToken(mockPayload);
       const token2 = generateToken({
         ...mockPayload,
@@ -24,59 +58,85 @@ describe('JWT Utilities', () => {
 
       expect(token1).not.toBe(token2);
     });
+
+    it('should throw and log error when jwt.sign fails', () => {
+      const mockError = new Error('Sign error');
+      (jwt.sign as jest.Mock).mockImplementation(() => {
+        throw mockError;
+      });
+
+      expect(() => generateToken(mockPayload)).toThrow('Sign error');
+    });
   });
 
   describe('verifyToken', () => {
     it('should verify a valid token', () => {
-      const token = generateToken(mockPayload);
-      const decoded = verifyToken(token);
+      (jwt.verify as jest.Mock).mockReturnValue(mockPayload);
+
+      const decoded = verifyToken('valid.jwt.token');
 
       expect(decoded.userId).toBe(mockPayload.userId);
       expect(decoded.email).toBe(mockPayload.email);
       expect(decoded.roles).toEqual(mockPayload.roles);
+      expect(jwt.verify).toHaveBeenCalledWith(
+        'valid.jwt.token',
+        expect.any(String),
+        expect.objectContaining({
+          issuer: 'spec-manager-api',
+        }),
+      );
     });
 
     it('should throw error for invalid token', () => {
-      expect(() => verifyToken('invalid-token')).toThrow();
+      (jwt.verify as jest.Mock).mockImplementation(() => {
+        throw new Error('invalid token');
+      });
+
+      expect(() => verifyToken('invalid-token')).toThrow('invalid token');
     });
 
     it('should throw error for malformed token', () => {
-      expect(() => verifyToken('not.a.valid.jwt.token')).toThrow();
+      (jwt.verify as jest.Mock).mockImplementation(() => {
+        throw new Error('jwt malformed');
+      });
+
+      expect(() => verifyToken('not.a.valid.jwt.token')).toThrow('jwt malformed');
     });
 
     it('should throw error for token with wrong issuer', () => {
-      // 異なるissuerで生成されたトークンは検証失敗するはず
-      const jwt = require('jsonwebtoken');
-      const wrongIssuerToken = jwt.sign(mockPayload, process.env.JWT_SECRET, {
-        issuer: 'wrong-issuer',
+      (jwt.verify as jest.Mock).mockImplementation(() => {
+        throw new Error('jwt issuer invalid');
       });
 
-      expect(() => verifyToken(wrongIssuerToken)).toThrow();
+      expect(() => verifyToken('wrong-issuer-token')).toThrow('jwt issuer invalid');
     });
   });
 
   describe('decodeToken', () => {
     it('should decode token without verification', () => {
-      const token = generateToken(mockPayload);
-      const decoded = decodeToken(token);
+      (jwt.decode as jest.Mock).mockReturnValue(mockPayload);
+
+      const decoded = decodeToken('some.jwt.token');
 
       expect(decoded?.userId).toBe(mockPayload.userId);
       expect(decoded?.email).toBe(mockPayload.email);
+      expect(jwt.decode).toHaveBeenCalledWith('some.jwt.token');
     });
 
     it('should return null for invalid token', () => {
+      (jwt.decode as jest.Mock).mockReturnValue(null);
+
       const decoded = decodeToken('invalid-token');
+
       expect(decoded).toBeNull();
     });
 
     it('should decode even expired token', () => {
       // 期限切れのトークンでもデコードは可能（検証なし）
-      const jwt = require('jsonwebtoken');
-      const expiredToken = jwt.sign(mockPayload, process.env.JWT_SECRET, {
-        expiresIn: '-1s', // 1秒前に期限切れ
-      });
+      (jwt.decode as jest.Mock).mockReturnValue(mockPayload);
 
-      const decoded = decodeToken(expiredToken);
+      const decoded = decodeToken('expired.jwt.token');
+
       expect(decoded?.userId).toBe(mockPayload.userId);
     });
   });

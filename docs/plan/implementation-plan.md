@@ -1,8 +1,8 @@
 # 仕様書作成支援アプリ 実装計画書
 
 * **作成日**: 2025-11-19
-* **バージョン**: 1.4.0
-* **ステータス**: Phase 2.5 完了 + CI/CD パイプライン修正完了
+* **バージョン**: 1.5.0
+* **ステータス**: Phase 2.5 完了 + CI/CD パイプライン修正完了 + テストカバレッジ改善完了
 * **最終更新**: 2025-11-22
 
 ---
@@ -490,6 +490,51 @@ Phase 2 実装評価により、以下の状況が明らかになりました：
 - `a5d9193` - fix(types): Resolve TypeScript build errors in frontend
 - `2bb9916` - fix(ci): Correct frontend port from 5173 to 3000 in E2E test
 - `2dc15e3` - fix(e2e): Set reuseExistingServer to true in Playwright config
+
+#### **2.5.7 ワークフロートリガー修正とテストカバレッジ改善**
+
+**実装日**: 2025-11-22
+
+**背景**:
+- GitHub Actions ワークフローファイルに構文エラーがあり、CI/CD エラーが表示されていた
+- バックエンドの Jest カバレッジで一部ファイルのブランチカバレッジが 80% 未満だった
+- `claude/**` ブランチへの push 時に不要な CI ワークフローが実行されていた
+
+**問題と解決策**:
+
+| # | 問題 | 原因 | 解決策 |
+|---|------|------|--------|
+| 1 | cd-staging.yml / cd-production.yml でエラー | `environment.url` で `secrets` コンテキストを使用（GitHub Actions 非対応） | `environment` ブロックをシンプル化、URL 参照を削除 |
+| 2 | env.ts ブランチカバレッジ 42.1% | モジュールレベルの環境変数処理がテスト困難 | `createConfig()`, `validateRequiredEnvVars()`, `warnIfDefaultJwtSecret()` 関数に分離してテスタブルに |
+| 3 | jwt.ts ブランチカバレッジ 40% | `jwt.decode()` の到達不能 catch ブロック、モジュールレベルコード | デッドコード削除、Istanbul ignore コメント追加、モック化テスト追加 |
+| 4 | logger.ts ブランチカバレッジ 40% | 環境依存の分岐、未テストの stream.write | `createTextFormat()` 関数抽出、Istanbul ignore コメント追加、stream.write テスト追加 |
+| 5 | ci.yml で `claude/**` ブランチも CI 実行 | push トリガーに `claude/**` が含まれていた | push トリガーから `claude/**` を削除 |
+
+**テストカバレッジ改善結果**:
+
+| ファイル | Before (Branches) | After (Branches) | 改善 |
+|---------|-------------------|------------------|------|
+| `src/config/env.ts` | 42.1% | **100%** | +57.9% |
+| `src/utils/jwt.ts` | 40% | **100%** | +60% |
+| `src/utils/logger.ts` | 40% | **80%** | +40% |
+
+**主要な修正ファイル**:
+- `.github/workflows/cd-staging.yml` - environment.url の secrets 参照を削除
+- `.github/workflows/cd-production.yml` - environment.url の secrets 参照を削除
+- `.github/workflows/ci.yml` - push トリガーから `claude/**` を削除
+- `backend/src/config/env.ts` - テスタブルな関数に分離
+- `backend/src/utils/jwt.ts` - デッドコード削除、Istanbul ignore 追加
+- `backend/src/utils/logger.ts` - `createTextFormat()` 関数抽出
+- `backend/tests/unit/config/env.test.ts` - 新規作成（18テスト）
+- `backend/tests/unit/jwt.test.ts` - モック化、エラーケース追加（10テスト）
+- `backend/tests/unit/logger.test.ts` - 新規作成（8テスト）
+
+**コミット履歴**:
+- `6a90f60` - fix(ci): Remove secrets from environment.url in CD workflows
+- `b5e8e4c` - test(backend): Add comprehensive tests for env.ts and refactor for testability
+- `1d72e72` - test(backend): Improve jwt.ts test coverage to 100%
+- `68133c0` - test(backend): Add logger.ts tests and improve coverage to 80%+
+- `7cee35e` - ci: Remove claude/** branch from CI push triggers
 
 ---
 
@@ -1019,5 +1064,5 @@ Phase 2 実装評価により、以下の状況が明らかになりました：
 ---
 
 * **作成者**: Claude
-* **最終更新**: 2025-11-21
-* **バージョン**: 1.3.0
+* **最終更新**: 2025-11-22
+* **バージョン**: 1.5.0

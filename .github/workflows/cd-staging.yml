@@ -15,9 +15,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging Environment
     runs-on: ubuntu-latest
-    environment:
-      name: staging
-      url: https://${{ env.SERVICE_NAME_FRONTEND }}-${{ secrets.GCP_PROJECT_NUMBER }}.a.run.app
+    environment: staging
 
     steps:
       - name: Checkout code
