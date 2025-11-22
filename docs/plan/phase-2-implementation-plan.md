@@ -2641,11 +2641,11 @@ describe('FieldForm - editing field data population', () => {
 
 #### チェックリスト
 
-- [ ] 新規テストケースを `FieldForm.test.tsx` に追加
-- [ ] テストが失敗することを確認（RED）
-- [ ] `FieldForm.tsx` に `useEffect` を実装
-- [ ] 新規テストがパスすることを確認（GREEN）
-- [ ] 既存のテスト 14 件がすべてパスすることを確認
+- [x] 新規テストケースを `FieldForm.test.tsx` に追加 ✅
+- [x] テストが失敗することを確認（RED） ✅
+- [x] `FieldForm.tsx` に `useEffect` を実装 ✅
+- [x] 新規テストがパスすることを確認（GREEN） ✅
+- [x] 既存のテスト 13 件がすべてパスすることを確認 ✅ (17 tests total)
 - [ ] E2E テスト `schema-settings.spec.ts` がパスすることを確認
 - [ ] コードレビュー完了
 
