@@ -2,7 +2,7 @@ name: CI - Build and Test
 
 on:
   push:
-    branches: [main, develop, 'claude/**']
+    branches: [main, develop]
   pull_request:
     branches: [main, develop]
 
