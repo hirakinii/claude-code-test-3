@@ -257,13 +257,27 @@ export async function updateField(
       displayOrder?: number;
     } = {};
 
-    if (data.fieldName !== undefined) updateData.fieldName = data.fieldName;
-    if (data.dataType !== undefined) updateData.dataType = data.dataType;
-    if (data.isRequired !== undefined) updateData.isRequired = data.isRequired;
-    if (data.options !== undefined && data.options !== null) updateData.options = data.options;
-    if (data.listTargetEntity !== undefined) updateData.listTargetEntity = data.listTargetEntity;
-    if (data.placeholderText !== undefined) updateData.placeholderText = data.placeholderText;
-    if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder;
+    if (data.fieldName !== undefined) {
+      updateData.fieldName = data.fieldName;
+    }
+    if (data.dataType !== undefined) {
+      updateData.dataType = data.dataType;
+    }
+    if (data.isRequired !== undefined) {
+      updateData.isRequired = data.isRequired;
+    }
+    if (data.options !== undefined && data.options !== null) {
+      updateData.options = data.options;
+    }
+    if (data.listTargetEntity !== undefined) {
+      updateData.listTargetEntity = data.listTargetEntity;
+    }
+    if (data.placeholderText !== undefined) {
+      updateData.placeholderText = data.placeholderText;
+    }
+    if (data.displayOrder !== undefined) {
+      updateData.displayOrder = data.displayOrder;
+    }
 
     const field = await prisma.schemaField.update({
       where: { id },
