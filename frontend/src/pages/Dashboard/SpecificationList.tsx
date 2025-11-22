@@ -80,15 +80,13 @@ function SpecificationList({
     }
   };
 
-  if (specifications.length === 0) {
-    return (
-      <Paper sx={{ p: 4, textAlign: 'center' }}>
-        <Typography variant="body1" color="text.secondary">
-          仕様書がありません。「新規作成」ボタンから作成してください。
-        </Typography>
-      </Paper>
-    );
-  }
+  const renderEmptyState = () => (
+    <Paper sx={{ p: 4, textAlign: 'center' }}>
+      <Typography variant="body1" color="text.secondary">
+        仕様書がありません。「新規作成」ボタンから作成してください。
+      </Typography>
+    </Paper>
+  );
 
   return (
     <Box>
@@ -109,58 +107,62 @@ function SpecificationList({
         </FormControl>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>件名</TableCell>
-              <TableCell>ステータス</TableCell>
-              <TableCell>バージョン</TableCell>
-              <TableCell>更新日時</TableCell>
-              <TableCell align="right">操作</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {specifications.map((spec) => (
-              <TableRow key={spec.id} hover>
-                <TableCell>{spec.title || '（無題）'}</TableCell>
-                <TableCell>
-                  <StatusBadge status={spec.status} />
-                </TableCell>
-                <TableCell>{spec.version}</TableCell>
-                <TableCell>{formatDate(spec.updatedAt)}</TableCell>
-                <TableCell align="right">
-                  {spec.status === 'SAVED' ? (
-                    <IconButton
-                      aria-label="view"
-                      onClick={() => handleView(spec.id)}
-                      title="詳細を表示"
-                    >
-                      <ViewIcon />
-                    </IconButton>
-                  ) : (
-                    <IconButton
-                      aria-label="edit"
-                      onClick={() => handleEdit(spec.id)}
-                      title="編集"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  )}
-                  <IconButton
-                    aria-label="delete"
-                    color="error"
-                    onClick={() => handleDeleteClick(spec.id)}
-                    title="削除"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
+      {specifications.length === 0 ? (
+        renderEmptyState()
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>件名</TableCell>
+                <TableCell>ステータス</TableCell>
+                <TableCell>バージョン</TableCell>
+                <TableCell>更新日時</TableCell>
+                <TableCell align="right">操作</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {specifications.map((spec) => (
+                <TableRow key={spec.id} hover>
+                  <TableCell>{spec.title || '（無題）'}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={spec.status} />
+                  </TableCell>
+                  <TableCell>{spec.version}</TableCell>
+                  <TableCell>{formatDate(spec.updatedAt)}</TableCell>
+                  <TableCell align="right">
+                    {spec.status === 'SAVED' ? (
+                      <IconButton
+                        aria-label="view"
+                        onClick={() => handleView(spec.id)}
+                        title="詳細を表示"
+                      >
+                        <ViewIcon />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        aria-label="edit"
+                        onClick={() => handleEdit(spec.id)}
+                        title="編集"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    )}
+                    <IconButton
+                      aria-label="delete"
+                      color="error"
+                      onClick={() => handleDeleteClick(spec.id)}
+                      title="削除"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       {pagination && pagination.totalPages > 1 && (
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
