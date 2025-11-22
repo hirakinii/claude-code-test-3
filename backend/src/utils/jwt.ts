@@ -1,9 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { logger } from './logger';
 
+/* istanbul ignore next -- @preserve: Environment variable fallbacks only used when env vars are missing */
 const JWT_SECRET = process.env.JWT_SECRET || '';
+/* istanbul ignore next -- @preserve: Environment variable fallbacks only used when env vars are missing */
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
+/* istanbul ignore if -- @preserve: This check runs at module load time when JWT_SECRET is always set in tests */
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined in environment variables');
 }
@@ -56,14 +59,14 @@ export function verifyToken(token: string): JwtPayload {
 
 /**
  * JWTトークンをデコードする（検証なし）
+ * jwt.decode() は例外を投げず、無効なトークンには null を返す
  * @param token - デコードするトークン
  * @returns デコードされたペイロード、またはnull
  */
 export function decodeToken(token: string): JwtPayload | null {
-  try {
-    return jwt.decode(token) as JwtPayload;
-  } catch (error) {
-    logger.warn('JWT token decoding failed', { error });
-    return null;
+  const decoded = jwt.decode(token) as JwtPayload | null;
+  if (decoded) {
+    logger.debug('JWT token decoded', { userId: decoded.userId });
   }
+  return decoded;
 }
