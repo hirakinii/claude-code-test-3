@@ -19,19 +19,19 @@ router.use(requireAuth);
 router.use(requireAdmin);
 
 // スキーマ取得
-router.get('/:schemaId', getSchemaHandler as RequestHandler);
+router.get('/:schemaId', getSchemaHandler as unknown as RequestHandler);
 
 // カテゴリCRUD
-router.post('/categories', createCategoryHandler as RequestHandler);
-router.put('/categories/:id', updateCategoryHandler as RequestHandler);
-router.delete('/categories/:id', deleteCategoryHandler as RequestHandler);
+router.post('/categories', createCategoryHandler as unknown as RequestHandler);
+router.put('/categories/:id', updateCategoryHandler as unknown as RequestHandler);
+router.delete('/categories/:id', deleteCategoryHandler as unknown as RequestHandler);
 
 // フィールドCRUD
-router.post('/fields', createFieldHandler as RequestHandler);
-router.put('/fields/:id', updateFieldHandler as RequestHandler);
-router.delete('/fields/:id', deleteFieldHandler as RequestHandler);
+router.post('/fields', createFieldHandler as unknown as RequestHandler);
+router.put('/fields/:id', updateFieldHandler as unknown as RequestHandler);
+router.delete('/fields/:id', deleteFieldHandler as unknown as RequestHandler);
 
 // デフォルト復元
-router.post('/reset', resetSchemaHandler as RequestHandler);
+router.post('/reset', resetSchemaHandler as unknown as RequestHandler);
 
 export default router;

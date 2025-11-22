@@ -29,23 +29,9 @@ declare global {
 const prisma: PrismaClient = globalThis.prismaGlobal ?? prismaClientSingleton();
 
 // ログイベントハンドラーの設定
-prisma.$on('query', (e) => {
-  if (process.env.NODE_ENV === 'development') {
-    logger.debug('Query executed', {
-      query: e.query,
-      params: e.params,
-      duration: `${e.duration}ms`,
-    });
-  }
-});
-
-prisma.$on('error', (e) => {
-  logger.error('Database error', { message: e.message });
-});
-
-prisma.$on('warn', (e) => {
-  logger.warn('Database warning', { message: e.message });
-});
+// Note: Prisma の $on メソッドは型定義が厳密で、イベントハンドラの設定には
+// PrismaClient の初期化時に log オプションで指定したイベントのみ使用可能
+// 開発環境では上記の log 設定でクエリログが出力される
 
 // 本番環境以外ではグローバル変数にインスタンスを保存
 if (process.env.NODE_ENV !== 'production') {

@@ -192,7 +192,7 @@ export async function createField(data: {
         fieldName: data.fieldName,
         dataType: data.dataType,
         isRequired: data.isRequired,
-        options: data.options || null,
+        options: data.options ?? undefined,
         listTargetEntity: data.listTargetEntity,
         placeholderText: data.placeholderText,
         displayOrder: data.displayOrder,
@@ -247,9 +247,27 @@ export async function updateField(
     }
 
     // 更新
+    const updateData: {
+      fieldName?: string;
+      dataType?: 'TEXT' | 'TEXTAREA' | 'DATE' | 'RADIO' | 'CHECKBOX' | 'LIST';
+      isRequired?: boolean;
+      options?: string[];
+      listTargetEntity?: string | null;
+      placeholderText?: string | null;
+      displayOrder?: number;
+    } = {};
+
+    if (data.fieldName !== undefined) updateData.fieldName = data.fieldName;
+    if (data.dataType !== undefined) updateData.dataType = data.dataType;
+    if (data.isRequired !== undefined) updateData.isRequired = data.isRequired;
+    if (data.options !== undefined && data.options !== null) updateData.options = data.options;
+    if (data.listTargetEntity !== undefined) updateData.listTargetEntity = data.listTargetEntity;
+    if (data.placeholderText !== undefined) updateData.placeholderText = data.placeholderText;
+    if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder;
+
     const field = await prisma.schemaField.update({
       where: { id },
-      data,
+      data: updateData,
     });
 
     logger.info('Field updated successfully', { fieldId: id });

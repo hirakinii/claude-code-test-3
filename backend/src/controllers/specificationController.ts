@@ -5,7 +5,7 @@ import {
   CreateSpecificationRequestBody,
   GetSpecificationsQueryParams,
 } from '../types/requests';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { AuthRequest } from '../middleware/auth';
 import { logger } from '../utils/logger';
 
 /**
@@ -13,12 +13,12 @@ import { logger } from '../utils/logger';
  * GET /api/specifications
  */
 export async function getSpecificationsHandler(
-  req: AuthenticatedRequest,
+  req: AuthRequest,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
@@ -64,12 +64,12 @@ export async function getSpecificationsHandler(
  * POST /api/specifications
  */
 export async function createSpecificationHandler(
-  req: AuthenticatedRequest,
+  req: AuthRequest,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
@@ -115,12 +115,12 @@ export async function createSpecificationHandler(
  * GET /api/specifications/:id
  */
 export async function getSpecificationByIdHandler(
-  req: AuthenticatedRequest,
+  req: AuthRequest,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
@@ -170,12 +170,12 @@ export async function getSpecificationByIdHandler(
  * DELETE /api/specifications/:id
  */
 export async function deleteSpecificationHandler(
-  req: AuthenticatedRequest,
+  req: AuthRequest,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) {
       res.status(401).json({ success: false, error: 'Unauthorized' });
       return;
