@@ -1,9 +1,9 @@
 # 仕様書作成支援アプリ 実装計画書
 
 * **作成日**: 2025-11-19
-* **バージョン**: 1.3.0
-* **ステータス**: Phase 2.5（ログイン機能とフロントエンドテスト）追加反映済み
-* **最終更新**: 2025-11-21
+* **バージョン**: 1.4.0
+* **ステータス**: Phase 2.5 完了 + CI/CD パイプライン修正完了
+* **最終更新**: 2025-11-22
 
 ---
 
@@ -451,6 +451,45 @@ Phase 2 実装評価により、以下の状況が明らかになりました：
 - `de938bc` - fix(e2e): Fix strict mode violation in login test
 - `35d04b3` - fix(e2e): Configure backend to run in test mode during E2E tests
 - `3fb6111` - feat(e2e): Add cross-platform support for E2E test environment
+
+#### **2.5.6 CI/CDパイプライン修正**
+
+**実装日**: 2025-11-22
+
+**問題と解決策**:
+
+| # | 問題 | 原因 | 解決策 |
+|---|------|------|--------|
+| 1 | npm workspaces非対応 | `cache-dependency-path`がワークスペースの`package-lock.json`を参照 | ルートの`package-lock.json`を参照するよう変更 |
+| 2 | シードデータ未投入 | `prisma:seed`ステップがない | `backend-test`ジョブに追加 |
+| 3 | TypeScript ESLintエラー（93件） | 厳格な型チェック | 型定義ファイル追加、型注釈追加 |
+| 4 | Prettierフォーマットエラー（27ファイル） | コードスタイル不整合 | `npm run format`で修正 |
+| 5 | フロントエンドビルド型エラー | `FieldForm.tsx`の型不一致 | payload構築方法を修正 |
+| 6 | フロントエンドポート不一致 | CIで5173を使用、実際は3000 | ポート番号を3000に修正 |
+| 7 | Playwrightサーバー起動競合 | `reuseExistingServer: false` | `true`に変更 |
+
+**主要な修正ファイル**:
+- `.github/workflows/ci.yml` - npm workspaces対応、prisma:seed追加、ポート修正
+- `backend/src/types/requests.ts` - 新規作成（リクエストボディの型定義）
+- `frontend/tsconfig.json` - テストファイルをexcludeから削除
+- `frontend/playwright.config.ts` - reuseExistingServer: true
+
+**CI/CDパイプライン状況**:
+- ✅ Backend - Build & Test: 通過
+- ✅ Frontend - Build & Test: 通過
+- ✅ E2E Tests (Playwright): 通過
+- ⚠️ Security Audit: 警告あり
+- ⏳ CD (Staging/Production): 未対応
+
+**コミット履歴**:
+- `0f04351` - fix(ci): Adapt CI pipeline for npm workspaces monorepo structure
+- `1d57953` - fix(lint): Resolve all TypeScript ESLint errors in backend and frontend
+- `3cb61b4` - fix(lint): Resolve remaining TypeScript ESLint errors
+- `c006765` - style: Fix Prettier formatting issues in backend and frontend
+- `091f5e8` - fix(ci): Add prisma:seed step to backend test job
+- `a5d9193` - fix(types): Resolve TypeScript build errors in frontend
+- `2bb9916` - fix(ci): Correct frontend port from 5173 to 3000 in E2E test
+- `2dc15e3` - fix(e2e): Set reuseExistingServer to true in Playwright config
 
 ---
 
