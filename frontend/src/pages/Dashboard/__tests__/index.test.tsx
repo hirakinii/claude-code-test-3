@@ -101,8 +101,9 @@ describe('Dashboard', () => {
       specificationApi.specificationApi.getSpecifications as ReturnType<
         typeof vi.fn
       >
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    ).mockImplementation(() => new Promise(() => {}));
+    )
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      .mockImplementation(() => new Promise(() => {}));
 
     renderWithProviders(<Dashboard />);
 
