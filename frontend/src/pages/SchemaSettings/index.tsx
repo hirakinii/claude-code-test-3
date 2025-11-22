@@ -9,7 +9,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Settings as SettingsIcon, Refresh } from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { useSchema } from '../../hooks/useSchema';
 import CategoryList from './CategoryList';
 import CategoryForm from './CategoryForm';

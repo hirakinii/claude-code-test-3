@@ -58,11 +58,11 @@ function SpecificationList({
   };
 
   const handleEdit = (id: string) => {
-    navigate(`/specifications/${id}/edit`);
+    void navigate(`/specifications/${id}/edit`);
   };
 
   const handleView = (id: string) => {
-    navigate(`/specifications/${id}`);
+    void navigate(`/specifications/${id}`);
   };
 
   const handleStatusFilterChange = (event: SelectChangeEvent<string>) => {

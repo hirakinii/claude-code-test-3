@@ -15,7 +15,7 @@ import {
 } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 
 function Header() {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ function Header() {
   const handleLogout = () => {
     handleClose();
     logout();
-    navigate('/login');
+    void navigate('/login');
   };
 
   return (
@@ -43,7 +43,7 @@ function Header() {
           variant="h6"
           component="div"
           sx={{ flexGrow: 1, cursor: 'pointer' }}
-          onClick={() => navigate('/dashboard')}
+          onClick={() => void navigate('/dashboard')}
         >
           仕様書作成支援アプリ
         </Typography>
@@ -53,7 +53,7 @@ function Header() {
             <Button
               color="inherit"
               startIcon={<SettingsIcon />}
-              onClick={() => navigate('/settings/schema')}
+              onClick={() => void navigate('/settings/schema')}
             >
               設定
             </Button>

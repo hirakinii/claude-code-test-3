@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Container, Typography, Box, Button, CircularProgress, Alert } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { useSpecifications } from '../../hooks/useSpecifications';
 import SpecificationList from './SpecificationList';
 import CreateSpecificationModal from './CreateSpecificationModal';
@@ -23,14 +23,16 @@ function Dashboard() {
 
   const handleCreateSuccess = () => {
     setOpenCreateModal(false);
-    refetch();
+    void refetch();
   };
 
-  const handleDelete = async (id: string) => {
-    const success = await deleteSpecification(id);
-    if (success) {
-      refetch();
-    }
+  const handleDelete = (id: string) => {
+    void (async () => {
+      const success = await deleteSpecification(id);
+      if (success) {
+        void refetch();
+      }
+    })();
   };
 
   if (loading) {

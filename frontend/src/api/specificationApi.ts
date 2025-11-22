@@ -51,10 +51,18 @@ export const specificationApi = {
     token: string,
   ): Promise<PaginatedSpecifications> => {
     const queryParams = new URLSearchParams();
-    if (params.page) queryParams.append('page', params.page.toString());
-    if (params.limit) queryParams.append('limit', params.limit.toString());
-    if (params.status) queryParams.append('status', params.status);
-    if (params.sort) queryParams.append('sort', params.sort);
+    if (params.page) {
+      queryParams.append('page', params.page.toString());
+    }
+    if (params.limit) {
+      queryParams.append('limit', params.limit.toString());
+    }
+    if (params.status) {
+      queryParams.append('status', params.status);
+    }
+    if (params.sort) {
+      queryParams.append('sort', params.sort);
+    }
 
     const response = await axios.get<ApiResponse<PaginatedSpecifications>>(
       `${API_URL}/api/specifications?${queryParams.toString()}`,
