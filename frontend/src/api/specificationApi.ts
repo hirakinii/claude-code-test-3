@@ -1,4 +1,9 @@
 import axios from 'axios';
+import {
+  SpecificationContentResponse,
+  SaveSpecificationResponse,
+  WizardFormData,
+} from '../types/wizard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -113,5 +118,39 @@ export const specificationApi = {
     await axios.delete(`${API_URL}/api/specifications/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+  },
+
+  /**
+   * 仕様書コンテンツを取得（ウィザード用）
+   */
+  getSpecificationContent: async (
+    id: string,
+    token: string,
+  ): Promise<SpecificationContentResponse> => {
+    const response = await axios.get<ApiResponse<SpecificationContentResponse>>(
+      `${API_URL}/api/specifications/${id}/content`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    return response.data.data;
+  },
+
+  /**
+   * 仕様書を保存（ウィザード用）
+   */
+  saveSpecification: async (
+    id: string,
+    formData: WizardFormData,
+    token: string,
+  ): Promise<SaveSpecificationResponse> => {
+    const response = await axios.put<ApiResponse<SaveSpecificationResponse>>(
+      `${API_URL}/api/specifications/${id}`,
+      formData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    return response.data.data;
   },
 };

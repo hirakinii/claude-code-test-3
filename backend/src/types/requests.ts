@@ -70,3 +70,36 @@ export interface GetSpecificationsQueryParams {
   status?: 'DRAFT' | 'REVIEW' | 'SAVED';
   sort?: string;
 }
+
+// ============================================
+// Specification Save Request Bodies
+// ============================================
+
+export interface DeliverableInput {
+  name: string;
+  quantity?: number;
+  description?: string;
+}
+
+export interface ContractorRequirementInput {
+  category: string;
+  description: string;
+}
+
+export interface BasicBusinessRequirementInput {
+  category: string;
+  description: string;
+}
+
+export interface BusinessTaskInput {
+  title: string;
+  detailedSpec: string;
+}
+
+export interface SaveSpecificationRequestBody {
+  content: Record<string, string | string[] | null>;
+  deliverables: DeliverableInput[];
+  contractorRequirements: ContractorRequirementInput[];
+  basicBusinessRequirements: BasicBusinessRequirementInput[];
+  businessTasks: BusinessTaskInput[];
+}
