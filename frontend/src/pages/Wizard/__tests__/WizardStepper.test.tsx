@@ -71,8 +71,9 @@ describe('WizardStepper', () => {
       />,
     );
 
-    const secondStep = screen.getByText('納品情報');
-    fireEvent.click(secondStep);
+    // Get buttons and click on the second one (index 1)
+    const steps = screen.getAllByRole('button');
+    fireEvent.click(steps[1]);
 
     expect(onStepClick).toHaveBeenCalledWith(1);
   });
