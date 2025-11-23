@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import WizardStepper from '../WizardStepper';
 import { SchemaCategory } from '../../../types/wizard';
 
@@ -60,7 +61,8 @@ describe('WizardStepper', () => {
     expect(steps).toHaveLength(3);
   });
 
-  it('should call onStepClick when step is clicked', () => {
+  it('should call onStepClick when step is clicked', async () => {
+    const user = userEvent.setup();
     const onStepClick = vi.fn();
 
     render(
@@ -73,7 +75,7 @@ describe('WizardStepper', () => {
 
     // Get buttons and click on the second one (index 1)
     const steps = screen.getAllByRole('button');
-    fireEvent.click(steps[1]);
+    await user.click(steps[1]);
 
     expect(onStepClick).toHaveBeenCalledWith(1);
   });
