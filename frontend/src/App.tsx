@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 const Login = lazy(() => import('./pages/Login'));
 const SchemaSettings = lazy(() => import('./pages/SchemaSettings'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Wizard = lazy(() => import('./pages/Wizard'));
 
 const theme = createTheme({
   palette: {
@@ -59,6 +60,15 @@ function App() {
                 element={
                   <ProtectedRoute requireAdmin>
                     <SchemaSettings />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/specifications/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <Wizard />
                   </ProtectedRoute>
                 }
               />

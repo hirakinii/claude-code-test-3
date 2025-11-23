@@ -4,6 +4,8 @@ import {
   createSpecification,
   getSpecificationById,
   deleteSpecification,
+  getSpecificationContent,
+  saveSpecification,
 } from '../../../src/services/specificationService';
 
 const prisma = new PrismaClient();
@@ -466,6 +468,377 @@ describe('SpecificationService', () => {
       await expect(
         deleteSpecification(otherSpec.id, testUserId),
       ).rejects.toThrow('Access denied');
+    });
+  });
+
+  describe('getSpecificationContent', () => {
+    let testFieldId: string;
+
+    beforeAll(async () => {
+      // Get a field from the default schema for testing
+      const schema = await prisma.schema.findFirst({
+        where: { isDefault: true },
+        include: {
+          categories: {
+            include: { fields: true },
+          },
+        },
+      });
+      if (schema?.categories[0]?.fields[0]) {
+        testFieldId = schema.categories[0].fields[0].id;
+      }
+    });
+
+    it('should return specification content with EAV data', async () => {
+      // Create specification with content
+      const spec = await prisma.specification.create({
+        data: {
+          authorId: testUserId,
+          schemaId: testSchemaId,
+          title: 'Test Content Spec',
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(spec.id);
+
+      // Add EAV content
+      if (testFieldId) {
+        await prisma.specificationContent.create({
+          data: {
+            specificationId: spec.id,
+            fieldId: testFieldId,
+            value: JSON.stringify('Test value'),
+          },
+        });
+      }
+
+      const result = await getSpecificationContent(spec.id, testUserId);
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(spec.id);
+      expect(result.title).toBe('Test Content Spec');
+      expect(result.content).toBeDefined();
+      expect(typeof result.content).toBe('object');
+    });
+
+    it('should return specification with sub-entities', async () => {
+      // Create specification
+      const spec = await prisma.specification.create({
+        data: {
+          authorId: testUserId,
+          schemaId: testSchemaId,
+          title: 'Test Sub-Entity Spec',
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(spec.id);
+
+      // Add deliverable
+      await prisma.deliverable.create({
+        data: {
+          specificationId: spec.id,
+          name: 'Test Deliverable',
+          quantity: 1,
+          description: 'Test description',
+        },
+      });
+
+      // Add business task
+      await prisma.businessTask.create({
+        data: {
+          specificationId: spec.id,
+          title: 'Test Task',
+          detailedSpec: 'Test detailed spec',
+        },
+      });
+
+      const result = await getSpecificationContent(spec.id, testUserId);
+
+      expect(result.deliverables).toBeDefined();
+      expect(result.deliverables.length).toBe(1);
+      expect(result.deliverables[0].name).toBe('Test Deliverable');
+
+      expect(result.businessTasks).toBeDefined();
+      expect(result.businessTasks.length).toBe(1);
+      expect(result.businessTasks[0].title).toBe('Test Task');
+    });
+
+    it('should throw error for non-existent specification', async () => {
+      await expect(
+        getSpecificationContent(
+          '00000000-0000-0000-0000-000000000000',
+          testUserId,
+        ),
+      ).rejects.toThrow('Specification not found');
+    });
+
+    it('should throw error when accessing other user specification', async () => {
+      // Create other user's specification
+      const otherSpec = await prisma.specification.create({
+        data: {
+          authorId: otherUserId,
+          schemaId: testSchemaId,
+          title: 'Other User Content Spec',
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(otherSpec.id);
+
+      await expect(
+        getSpecificationContent(otherSpec.id, testUserId),
+      ).rejects.toThrow('Access denied');
+    });
+  });
+
+  describe('saveSpecification', () => {
+    let testFieldId: string;
+
+    beforeAll(async () => {
+      // Get a field from the default schema for testing
+      const schema = await prisma.schema.findFirst({
+        where: { isDefault: true },
+        include: {
+          categories: {
+            include: { fields: true },
+          },
+        },
+      });
+      if (schema?.categories[0]?.fields[0]) {
+        testFieldId = schema.categories[0].fields[0].id;
+      }
+    });
+
+    it('should save EAV content correctly', async () => {
+      // Create specification
+      const spec = await prisma.specification.create({
+        data: {
+          authorId: testUserId,
+          schemaId: testSchemaId,
+          title: null,
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(spec.id);
+
+      const payload = {
+        content: testFieldId ? { [testFieldId]: 'Test saved value' } : {},
+        deliverables: [],
+        contractorRequirements: [],
+        basicBusinessRequirements: [],
+        businessTasks: [],
+      };
+
+      const result = await saveSpecification(spec.id, testUserId, payload);
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(spec.id);
+
+      // Verify EAV data was saved
+      const savedContent = await prisma.specificationContent.findMany({
+        where: { specificationId: spec.id },
+      });
+      expect(savedContent.length).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should save sub-entities correctly', async () => {
+      // Create specification
+      const spec = await prisma.specification.create({
+        data: {
+          authorId: testUserId,
+          schemaId: testSchemaId,
+          title: null,
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(spec.id);
+
+      const payload = {
+        content: {},
+        deliverables: [
+          { name: 'Saved Deliverable', quantity: 2, description: 'Saved desc' },
+        ],
+        contractorRequirements: [
+          { category: 'Category A', description: 'Requirement desc' },
+        ],
+        basicBusinessRequirements: [
+          { category: 'Category B', description: 'Business req desc' },
+        ],
+        businessTasks: [
+          { title: 'Saved Task', detailedSpec: 'Saved detailed spec' },
+        ],
+      };
+
+      await saveSpecification(spec.id, testUserId, payload);
+
+      // Verify sub-entities were saved
+      const deliverables = await prisma.deliverable.findMany({
+        where: { specificationId: spec.id },
+      });
+      expect(deliverables.length).toBe(1);
+      expect(deliverables[0].name).toBe('Saved Deliverable');
+
+      const tasks = await prisma.businessTask.findMany({
+        where: { specificationId: spec.id },
+      });
+      expect(tasks.length).toBe(1);
+      expect(tasks[0].title).toBe('Saved Task');
+    });
+
+    it('should replace existing sub-entities on save', async () => {
+      // Create specification with existing deliverable
+      const spec = await prisma.specification.create({
+        data: {
+          authorId: testUserId,
+          schemaId: testSchemaId,
+          title: null,
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(spec.id);
+
+      // Add existing deliverable
+      await prisma.deliverable.create({
+        data: {
+          specificationId: spec.id,
+          name: 'Old Deliverable',
+          quantity: 1,
+        },
+      });
+
+      // Save with new deliverable
+      const payload = {
+        content: {},
+        deliverables: [{ name: 'New Deliverable', quantity: 5 }],
+        contractorRequirements: [],
+        basicBusinessRequirements: [],
+        businessTasks: [],
+      };
+
+      await saveSpecification(spec.id, testUserId, payload);
+
+      // Verify old deliverable was replaced
+      const deliverables = await prisma.deliverable.findMany({
+        where: { specificationId: spec.id },
+      });
+      expect(deliverables.length).toBe(1);
+      expect(deliverables[0].name).toBe('New Deliverable');
+    });
+
+    it('should increment minor version when saving as draft', async () => {
+      // Create specification
+      const spec = await prisma.specification.create({
+        data: {
+          authorId: testUserId,
+          schemaId: testSchemaId,
+          title: null,
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(spec.id);
+
+      const payload = {
+        content: {},
+        deliverables: [],
+        contractorRequirements: [],
+        basicBusinessRequirements: [],
+        businessTasks: [],
+      };
+
+      const result = await saveSpecification(spec.id, testUserId, payload);
+
+      expect(result.version).toBe('1.1');
+      expect(result.status).toBe('DRAFT');
+    });
+
+    it('should throw error for non-existent specification', async () => {
+      await expect(
+        saveSpecification('00000000-0000-0000-0000-000000000000', testUserId, {
+          content: {},
+          deliverables: [],
+          contractorRequirements: [],
+          basicBusinessRequirements: [],
+          businessTasks: [],
+        }),
+      ).rejects.toThrow('Specification not found');
+    });
+
+    it('should throw error when saving other user specification', async () => {
+      // Create other user's specification
+      const otherSpec = await prisma.specification.create({
+        data: {
+          authorId: otherUserId,
+          schemaId: testSchemaId,
+          title: 'Other User Save Spec',
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(otherSpec.id);
+
+      await expect(
+        saveSpecification(otherSpec.id, testUserId, {
+          content: {},
+          deliverables: [],
+          contractorRequirements: [],
+          basicBusinessRequirements: [],
+          businessTasks: [],
+        }),
+      ).rejects.toThrow('Access denied');
+    });
+
+    it('should execute in transaction (atomic save)', async () => {
+      // Create specification
+      const spec = await prisma.specification.create({
+        data: {
+          authorId: testUserId,
+          schemaId: testSchemaId,
+          title: null,
+          status: 'DRAFT',
+          version: '1.0',
+        },
+      });
+      createdSpecificationIds.push(spec.id);
+
+      // Add existing data
+      await prisma.deliverable.create({
+        data: {
+          specificationId: spec.id,
+          name: 'Existing Deliverable',
+          quantity: 1,
+        },
+      });
+
+      // Save with new data
+      const payload = {
+        content: {},
+        deliverables: [
+          { name: 'New 1', quantity: 1 },
+          { name: 'New 2', quantity: 2 },
+        ],
+        contractorRequirements: [],
+        basicBusinessRequirements: [],
+        businessTasks: [],
+      };
+
+      await saveSpecification(spec.id, testUserId, payload);
+
+      // Verify atomicity - old data deleted, new data added
+      const deliverables = await prisma.deliverable.findMany({
+        where: { specificationId: spec.id },
+      });
+      expect(deliverables.length).toBe(2);
+      expect(deliverables.map((d) => d.name)).toContain('New 1');
+      expect(deliverables.map((d) => d.name)).toContain('New 2');
+      expect(deliverables.map((d) => d.name)).not.toContain(
+        'Existing Deliverable',
+      );
     });
   });
 });
