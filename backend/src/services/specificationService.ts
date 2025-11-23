@@ -362,9 +362,10 @@ export async function getSpecificationContent(
 /**
  * Calculate new version and status based on content
  */
-function calculateVersionAndStatus(
-  currentVersion: string,
-): { newVersion: string; newStatus: SpecificationStatus } {
+function calculateVersionAndStatus(currentVersion: string): {
+  newVersion: string;
+  newStatus: SpecificationStatus;
+} {
   const [major, minor] = currentVersion.split('.').map(Number);
 
   // For now, always increment minor version and keep as DRAFT

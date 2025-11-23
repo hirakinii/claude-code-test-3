@@ -18,7 +18,7 @@ test.describe('Wizard Page', () => {
     await page.click('button:has-text("新規作成")');
 
     // Wait for modal to appear and click create
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
 
     // Should navigate to wizard edit page
@@ -31,7 +31,7 @@ test.describe('Wizard Page', () => {
   test('should display stepper with all steps', async ({ page }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
@@ -45,7 +45,7 @@ test.describe('Wizard Page', () => {
   }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
@@ -69,7 +69,7 @@ test.describe('Wizard Page', () => {
   test('should navigate to step by clicking stepper', async ({ page }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
@@ -84,7 +84,7 @@ test.describe('Wizard Page', () => {
   test('should fill in text fields', async ({ page }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
@@ -99,7 +99,7 @@ test.describe('Wizard Page', () => {
   test('should add and remove list items (deliverables)', async ({ page }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
@@ -133,7 +133,7 @@ test.describe('Wizard Page', () => {
   test('should show auto-save indicator', async ({ page }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
@@ -153,7 +153,7 @@ test.describe('Wizard Page', () => {
   test('should show save button on last step', async ({ page }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
@@ -172,7 +172,7 @@ test.describe('Wizard Page', () => {
   }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
@@ -193,7 +193,7 @@ test.describe('Wizard Page', () => {
   }) => {
     // Create specification and navigate to wizard
     await page.click('button:has-text("新規作成")');
-    await expect(page.locator('text=新規仕様書を作成')).toBeVisible();
+    await expect(page.locator('text=新規仕様書の作成')).toBeVisible();
     await page.click('button:has-text("作成")');
     await page.waitForURL(/\/specifications\/.*\/edit/, { timeout: 10000 });
 
